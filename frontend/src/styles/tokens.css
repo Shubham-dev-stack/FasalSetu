@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #2E7D32;
+  --primary-soft: #E8F5E9;
+  --accent: #F59E0B;
+  --ink: #1F2937;
+  --muted: #6B7280;
+  --surface: #FFFFFF;
+  --bg: #F7F8F5;
+  --success: #2E7D32;
+  --warning: #B45309;
+  --danger: #B91C1C;
+  --info: #1D4ED8;
+}
+
+body {
+  margin: 0;
+  font-family: 'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color: var(--ink);
+  background-color: var(--bg);
+}
