@@ -5,7 +5,10 @@ export type UserRole =
   | 'buyer_retail'
   | 'buyer_fmcg'
   | 'transporter'
-  | 'operator';
+  | 'operator'
+  | 'PRODUCER'
+  | 'BUYER'
+  | 'ADMIN';
 
 export interface UserProfile {
   id: string;
@@ -195,6 +198,15 @@ export interface BenchmarkContext {
   benchmark_source?: string | null;
 }
 
+export interface LandedEstimate {
+  distance_km: number;
+  distance_source: string;
+  transport_cost_per_kg: number;
+  platform_fee_per_kg: number;
+  landed_price_per_kg: number;
+  basis: string;
+}
+
 export interface Listing {
   id: number;
   producer: ProducerSummary;
@@ -211,6 +223,7 @@ export interface Listing {
   status: 'ACTIVE' | 'SOLD_OUT' | 'EXPIRED' | 'WITHDRAWN';
   is_demo: boolean;
   harvest_age_days: number;
+  landed_estimate?: LandedEstimate | null;
   demand_status?: string | null;
   created_at: string;
 }
@@ -341,4 +354,75 @@ export interface RequirementListResponse {
   items: Requirement[];
   total: number;
 }
+
+export interface BuyerOrderSummary {
+  id: number;
+  org_name: string;
+  hub_id?: number | null;
+}
+
+export interface ProducerOrderSummary {
+  id: number;
+  org_name: string;
+  district: string;
+  state: string;
+}
+
+export interface CropOrderSummary {
+  id: number;
+  name: string;
+}
+
+export interface OrderEvent {
+  id: number;
+  order_id: number;
+  from_status?: string | null;
+  to_status: string;
+  actor_user_id: number;
+  actor_role: string;
+  note?: string | null;
+  at: string;
+}
+
+export interface Order {
+  id: number;
+  listing_id: number;
+  requirement_id?: number | null;
+  buyer: BuyerOrderSummary;
+  producer: ProducerOrderSummary;
+  crop: CropOrderSummary;
+  quantity_kg: number;
+  agreed_price_per_kg: number;
+  transport_cost_estimate_per_kg: number;
+  platform_fee_per_kg: number;
+  landed_price_per_kg_estimate: number;
+  total_amount_estimate: number;
+  delivery_date: string;
+  status: 'PLACED' | 'CONFIRMED' | 'REJECTED' | 'CANCELLED' | 'IN_TRANSIT' | 'DELIVERED';
+  origin: 'MARKETPLACE' | 'MATCHING';
+  shipment_id?: number | null;
+  allocated_transport_cost_total?: number | null;
+  events: OrderEvent[];
+  is_demo: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OrderCreateRequest {
+  listing_id: number;
+  quantity_kg: number;
+  delivery_date: string;
+  requirement_id?: number | null;
+}
+
+export interface OrderTransitionRequest {
+  to_status: 'CONFIRMED' | 'REJECTED' | 'CANCELLED';
+  note?: string | null;
+}
+
+export interface OrderListResponse {
+  items: Order[];
+  total: number;
+}
+
 

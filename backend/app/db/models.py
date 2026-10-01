@@ -213,7 +213,15 @@ class Order(Base):
         Index("ix_orders_producer_id", "producer_id"),
     )
 
-    events = relationship("OrderEvent", back_populates="order")
+    events = relationship(
+        "OrderEvent", back_populates="order", cascade="all, delete-orphan", order_by="OrderEvent.at.asc()"
+    )
+    listing = relationship("Listing")
+    requirement = relationship("Requirement")
+    buyer = relationship("BuyerProfile")
+    producer = relationship("ProducerProfile")
+    crop = relationship("Crop")
+    shipment = relationship("Shipment")
 
 
 class OrderEvent(Base):
@@ -229,6 +237,7 @@ class OrderEvent(Base):
     at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     order = relationship("Order", back_populates="events")
+    actor = relationship("User")
 
 
 class Vehicle(Base):

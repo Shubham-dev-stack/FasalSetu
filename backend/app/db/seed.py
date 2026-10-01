@@ -3,17 +3,22 @@ from datetime import timedelta
 from sqlalchemy.orm import Session
 
 from app.core.dates import today_ist
+from app.core.geo import road_distance_km
 from app.core.security import hash_password
 from app.db.models import (
     BuyerProfile,
     Crop,
     DemandHub,
     Listing,
+    Order,
+    OrderEvent,
     ProducerProfile,
     Requirement,
     User,
     Vehicle,
 )
+from app.modules.logistics.cost import estimate_dedicated_trip
+from app.modules.logistics.fleet import get_vehicle_types
 
 CANONICAL_PERSONAS = {
     "fpo_sonipat": "fpo_sonipat@demo.fasalsetu.local",
@@ -586,4 +591,141 @@ def seed_demo_requirements(db: Session) -> dict[str, int]:
 
     db.commit()
     return {"requirements": count}
+
+
+def seed_demo_orders(db: Session) -> dict[str, int]:
+    """Deterministically seed routing pool orders O1-O6 and historical orders H1-H4 per Data.md §12."""
+    today = today_ist()
+    vehicle_types = get_vehicle_types(db)
+    operator = db.query(User).filter(User.email == CANONICAL_PERSONAS["operator"]).first()
+    operator_id = operator.id if operator else 1
+
+    # O1-O6: routing pool (status CONFIRMED, no shipment, origin MARKETPLACE)
+    # H1-H4: historical orders (status DELIVERED, delivered 2-10 days ago, no shipment, origin MARKETPLACE)
+    orders_data = [
+        # O1: L1 Tomato, P2 -> B5, 600 kg @ 22.50
+        {"id": 1, "listing_id": 1, "buyer_id": 5, "crop_id": 1, "producer_id": 2, "quantity_kg": 600.0, "price_per_kg": 22.50, "days_ahead": 2, "status": "CONFIRMED"},
+        # O2: L5 Onion, P4 -> B4, 1200 kg @ 22.50
+        {"id": 2, "listing_id": 5, "buyer_id": 4, "crop_id": 2, "producer_id": 4, "quantity_kg": 1200.0, "price_per_kg": 22.50, "days_ahead": 3, "status": "CONFIRMED"},
+        # O3: L8 Potato, P4 -> B3, 900 kg @ 18.00
+        {"id": 3, "listing_id": 8, "buyer_id": 3, "crop_id": 3, "producer_id": 4, "quantity_kg": 900.0, "price_per_kg": 18.00, "days_ahead": 2, "status": "CONFIRMED"},
+        # O4: L2 Tomato, P6 -> B3, 500 kg @ 24.00
+        {"id": 4, "listing_id": 2, "buyer_id": 3, "crop_id": 1, "producer_id": 6, "quantity_kg": 500.0, "price_per_kg": 24.00, "days_ahead": 2, "status": "CONFIRMED"},
+        # O5: L10 Cauliflower, P1 -> B2, 400 kg @ 28.50
+        {"id": 5, "listing_id": 10, "buyer_id": 2, "crop_id": 4, "producer_id": 1, "quantity_kg": 400.0, "price_per_kg": 28.50, "days_ahead": 2, "status": "CONFIRMED"},
+        # O6: L12 Green Chilli, P5 -> B1, 150 kg @ 46.00
+        {"id": 6, "listing_id": 12, "buyer_id": 1, "crop_id": 5, "producer_id": 5, "quantity_kg": 150.0, "price_per_kg": 46.00, "days_ahead": 2, "status": "CONFIRMED"},
+        # H1: L6 Onion, 1000 kg @ 21.50 -> B4 (P2)
+        {"id": 7, "listing_id": 6, "buyer_id": 4, "crop_id": 2, "producer_id": 2, "quantity_kg": 1000.0, "price_per_kg": 21.50, "days_ago": 8, "status": "DELIVERED"},
+        # H2: L9 Potato, 800 kg @ 17.00 -> B5 (P2)
+        {"id": 8, "listing_id": 9, "buyer_id": 5, "crop_id": 3, "producer_id": 2, "quantity_kg": 800.0, "price_per_kg": 17.00, "days_ago": 5, "status": "DELIVERED"},
+        # H3: L7 Onion, 600 kg @ 21.00 -> B2 (P3)
+        {"id": 9, "listing_id": 7, "buyer_id": 2, "crop_id": 2, "producer_id": 3, "quantity_kg": 600.0, "price_per_kg": 21.00, "days_ago": 3, "status": "DELIVERED"},
+        # H4: L11 Cauliflower, 200 kg @ 27.00 -> B1 (P6)
+        {"id": 10, "listing_id": 11, "buyer_id": 1, "crop_id": 4, "producer_id": 6, "quantity_kg": 200.0, "price_per_kg": 27.00, "days_ago": 2, "status": "DELIVERED"},
+    ]
+
+    count = 0
+    for item in orders_data:
+        listing = db.query(Listing).filter(Listing.id == item["listing_id"]).first()
+        buyer = db.query(BuyerProfile).filter(BuyerProfile.id == item["buyer_id"]).first()
+        if not listing or not buyer:
+            continue
+
+        # Adjust listing quantity_available_kg per real reservation invariant
+        listing.quantity_available_kg = max(0.0, float(listing.quantity_available_kg) - item["quantity_kg"])
+        if listing.quantity_available_kg <= 0:
+            listing.status = "SOLD_OUT"
+
+        dist_km = road_distance_km(
+            (listing.producer.lat, listing.producer.lng),
+            (buyer.lat, buyer.lng),
+            circuity=1.35,
+        )
+        trip_est = estimate_dedicated_trip(dist_km, item["quantity_kg"], vehicle_types)
+        transport_cost_estimate_per_kg = trip_est["cost_per_kg"]
+        platform_fee_per_kg = round(item["price_per_kg"] * 0.02, 2)
+
+        if "days_ahead" in item:
+            delivery_date = today + timedelta(days=item["days_ahead"])
+        else:
+            delivery_date = today - timedelta(days=item["days_ago"])
+
+        existing = db.query(Order).filter(Order.id == item["id"]).first()
+        if existing:
+            existing.listing_id = item["listing_id"]
+            existing.buyer_id = item["buyer_id"]
+            existing.producer_id = item["producer_id"]
+            existing.crop_id = item["crop_id"]
+            existing.quantity_kg = item["quantity_kg"]
+            existing.agreed_price_per_kg = item["price_per_kg"]
+            existing.transport_cost_estimate_per_kg = transport_cost_estimate_per_kg
+            existing.platform_fee_per_kg = platform_fee_per_kg
+            existing.delivery_date = delivery_date
+            existing.status = item["status"]
+            existing.origin = "MARKETPLACE"
+            existing.is_demo = True
+            order = existing
+        else:
+            order = Order(
+                id=item["id"],
+                listing_id=item["listing_id"],
+                requirement_id=None,
+                buyer_id=item["buyer_id"],
+                producer_id=item["producer_id"],
+                crop_id=item["crop_id"],
+                quantity_kg=item["quantity_kg"],
+                agreed_price_per_kg=item["price_per_kg"],
+                transport_cost_estimate_per_kg=transport_cost_estimate_per_kg,
+                platform_fee_per_kg=platform_fee_per_kg,
+                delivery_date=delivery_date,
+                status=item["status"],
+                origin="MARKETPLACE",
+                shipment_id=None,
+                allocated_transport_cost_total=None,
+                is_demo=True,
+            )
+            db.add(order)
+            db.flush()
+
+        # Seed events for audit timeline
+        existing_events = db.query(OrderEvent).filter(OrderEvent.order_id == order.id).count()
+        if existing_events == 0:
+            e_placed = OrderEvent(
+                order_id=order.id,
+                from_status=None,
+                to_status="PLACED",
+                actor_user_id=operator_id,
+                actor_role="BUYER",
+                note="Marketplace direct purchase (Seeded)",
+            )
+            db.add(e_placed)
+
+            if item["status"] in ["CONFIRMED", "DELIVERED"]:
+                e_conf = OrderEvent(
+                    order_id=order.id,
+                    from_status="PLACED",
+                    to_status="CONFIRMED",
+                    actor_user_id=operator_id,
+                    actor_role="PRODUCER",
+                    note="Order confirmed by producer (Seeded)",
+                )
+                db.add(e_conf)
+
+            if item["status"] == "DELIVERED":
+                e_deliv = OrderEvent(
+                    order_id=order.id,
+                    from_status="CONFIRMED",
+                    to_status="DELIVERED",
+                    actor_user_id=operator_id,
+                    actor_role="ADMIN",
+                    note="Historical delivery completed (Seeded)",
+                )
+                db.add(e_deliv)
+
+        count += 1
+
+    db.commit()
+    return {"orders": count}
+
 

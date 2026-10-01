@@ -3,6 +3,7 @@ import argparse
 from app.core.database import Base, SessionLocal, engine
 from app.db.seed import (
     seed_demo_listings,
+    seed_demo_orders,
     seed_demo_requirements,
     seed_reference_and_users,
     seed_synthetic_demand_and_prices,
@@ -37,6 +38,11 @@ def setup_demo(retrain: bool = False, generate_data: bool = True):
         requirement_counts = seed_demo_requirements(db)
         print("Seeding demo requirements R1-R8 completed:")
         for k, v in requirement_counts.items():
+            print(f"  - {k}: {v}")
+
+        order_counts = seed_demo_orders(db)
+        print("Seeding demo orders O1-O6 and H1-H4 completed:")
+        for k, v in order_counts.items():
             print(f"  - {k}: {v}")
     finally:
         db.close()

@@ -11,6 +11,9 @@ import { ProducerProfilePage } from './pages/producer/ProducerProfilePage';
 import { RequirementsPage } from './pages/buyer/RequirementsPage';
 import { NewRequirementPage } from './pages/buyer/NewRequirementPage';
 import { BuyerProfilePage } from './pages/buyer/BuyerProfilePage';
+import { MarketplacePage } from './pages/market/MarketplacePage';
+import { OrdersPage } from './pages/orders/OrdersPage';
+import { OrderDetailPage } from './pages/orders/OrderDetailPage';
 
 const ProtectedLayout: React.FC<{ children: React.ReactNode; title?: string }> = ({
   children,
@@ -140,12 +143,8 @@ export default function App() {
           <Route
             path="/market"
             element={
-              <ProtectedLayout title="Market Discovery">
-                <PlaceholderPage
-                  title="Market Discovery"
-                  phase="Phase 5 — Unified Marketplace"
-                  description="Browse active crop listings, view benchmark price bands, and find supply by regional hub."
-                />
+              <ProtectedLayout title="Unified Marketplace">
+                <MarketplacePage />
               </ProtectedLayout>
             }
           />
@@ -156,7 +155,7 @@ export default function App() {
               <ProtectedLayout title="Demand Intelligence">
                 <PlaceholderPage
                   title="Demand Intelligence"
-                  phase="Phase 3 — ML Demand Forecast"
+                  phase="Phase 6 — ML Demand Forecast"
                   description="7-day demand projections across regional hubs powered by LightGBM model inferences."
                 />
               </ProtectedLayout>
@@ -167,11 +166,16 @@ export default function App() {
             path="/orders"
             element={
               <ProtectedLayout title="Order Management">
-                <PlaceholderPage
-                  title="Order Management"
-                  phase="Phase 7 — Order Lifecycle & Settlement"
-                  description="Track lifecycle status from PLACED through CONFIRMED, DISPATCHED, and DELIVERED."
-                />
+                <OrdersPage />
+              </ProtectedLayout>
+            }
+          />
+
+          <Route
+            path="/orders/:id"
+            element={
+              <ProtectedLayout title="Order Details">
+                <OrderDetailPage />
               </ProtectedLayout>
             }
           />

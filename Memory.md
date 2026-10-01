@@ -18,10 +18,10 @@ Update rules: Execution.md §8. Never record results that were not produced by a
 | Item | State |
 |---|---|
 | Documentation package (14 files + AGENTS.md) | **Complete** (moved to `docs/` with README, Memory, AGENTS at root) |
-| Source code | **Phase 4 complete** (Buyer Module + Buyer Profile + Requirement Lifecycle + Landed Price Guidance + Seed R1-R8 + Buyer UI) |
-| Current implementation phase | **Phase 4 complete — next: Phase 5** (Unified Marketplace + Discovery) |
-| Tests executed | **63 backend tests passed** (`pytest -v`), **17 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
-| Measured metrics | **Data & Model verified**: 8 requirements seeded (`R1`–`R8`); buyer profile retrieval and bounded update verified; object-level authorization verified (403 on cross-buyer & producer access); Rule D-021 dynamic expiry on GET/PATCH verified (409 on expired mutation); educational landed-cost guidance verified |
+| Source code | **Phase 5 complete** (Unified Marketplace + Discovery + Order Placement + Order Lifecycle State Machine + Seed Orders O1-O6 & H1-H4 + Orders UI) |
+| Current implementation phase | **Phase 5 complete — next: Phase 6** (Demand Intelligence / ML Demand Forecast) |
+| Tests executed | **74 backend tests passed** (`pytest -v`), **22 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
+| Measured metrics | **Marketplace & Orders verified**: 14 listings browsable with indicative landed prices; direct order placement with atomic conditional reservation on Listing; financial snapshotting (farmgate, dedicated haulage estimate, 2% platform fee); strict requirement compatibility validation; concurrency-safe requirement fulfillment; transition state machine with role-based authorization; deterministic seed orders O1-O6 (CONFIRMED) and H1-H4 (DELIVERED) |
 
 
 
@@ -96,7 +96,10 @@ Completed:
 - Phase 2: Synthetic demand generator (`generate_data.py`), benchmark price generator (`DEMO-PRICE-ANCHOR`), Agmarknet snapshot ingestion script (`ingest_agmarknet.py`), seed integration, generator configuration (`generator.yaml`, `market_hub_map.csv`), deterministic dropout, seed reproducibility, snapshot preservation guarantees.
 - Phase 3: Producer / Farmer / FPO module: `ProducerProfileOut`/`ProducerProfileUpdate` schemas, `GET/PATCH /producers/me`, `POST/GET/PATCH /listings`, `GET /listings/{id}` with `ListingDetailResponse`, nearest hub market price lookup (real `AGMARKNET_SNAPSHOT` prioritized over `SYNTHETIC_DEMO`), `PRICE_FAR_ABOVE_BENCHMARK` warning, object-level authorization (`AC-SEC-03`, `AC-LST-06`), query-time dynamic expiration (Rule D-021), deterministic seeding of listings `L1`–`L14`, frontend `ListingsPage`, `NewListingPage` with live benchmark hint & `DemandPanelPlaceholder`, `EditListingModal`, and `ProducerProfilePage`.
 
-Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 4 through 13).
+- Phase 4: Buyer Module: `BuyerProfileOut`/`BuyerProfileUpdate` schemas, `GET/PATCH /buyers/me`, `POST/GET/PATCH /requirements`, `GET /requirements/{id}` with `RequirementDetailResponse`, dynamic expiry evaluation on GET and PATCH, strict status validations, object-level authorization, and deterministic seeding of requirements `R1`–`R8`.
+- Phase 5: Unified Marketplace + Discovery: `POST /orders`, `GET /orders`, `GET /orders/{id}`, `POST /orders/{id}/transition`, atomic conditional reservation on Listing, concurrency-safe requirement fulfillment, financial snapshotting (farmgate, dedicated transport, 2% platform fee), deterministic seed orders O1–O6 (`CONFIRMED`, unrouted) and H1–H4 (`DELIVERED`, historical), frontend `MarketplacePage`, `OrderModal`, `OrdersPage`, and `OrderDetailPage`.
+
+Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 6 through 13).
 
 ## 12. Future work
 
@@ -104,7 +107,7 @@ PRD §18. Highlights: real demand data, Agmarknet/eNAM feeds, payments, individu
 
 ## 13. Next action
 
-1. Proceed to **Phase 4** (Phases.md §6): Buyer Module (`GET/PATCH /buyers/me`, requirements `POST/GET list/GET one/PATCH`, cancellation, seed requirements R1–R8, frontend Requirements list and New Requirement form).
+1. Proceed to **Phase 6** (Phases.md §7): Demand Intelligence / ML Demand Forecast (`GET /forecasts/demand`, `GET /forecasts/hubs`, `GET /forecasts/model-info`, LightGBM model training pipeline, model card, fallback validation, Demand Intelligence UI).
 
 
 

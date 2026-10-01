@@ -5,8 +5,10 @@ from sqlalchemy.orm import Session
 
 from app.core.dates import today_ist
 from app.core.errors import AppException
-from app.core.geo import haversine_km
+from app.core.geo import haversine_km, road_distance_km
 from app.db.models import Crop, DemandHub, Listing, MarketPrice, ProducerProfile, User
+from app.modules.logistics.cost import estimate_dedicated_trip
+from app.modules.logistics.fleet import get_vehicle_types
 from app.schemas.listing import (
     BenchmarkContext,
     CropSummary,
@@ -180,7 +182,37 @@ def create_listing(
     )
 
 
-def get_listing_detail(db: Session, listing_id: int) -> ListingDetailResponse:
+def compute_listing_landed_estimate(
+    listing: Listing,
+    b_lat: float,
+    b_lng: float,
+    vehicle_types: list[dict],
+) -> LandedEstimate:
+    p_lat = listing.producer.lat
+    p_lng = listing.producer.lng
+    dist_km = road_distance_km((p_lat, p_lng), (b_lat, b_lng), circuity=1.35)
+    rep_qty = float(listing.min_order_kg)
+    trip_est = estimate_dedicated_trip(dist_km, rep_qty, vehicle_types)
+    transport_per_kg = trip_est["cost_per_kg"]
+    fee_per_kg = round(float(listing.ask_price_per_kg) * 0.02, 2)
+    landed_per_kg = round(float(listing.ask_price_per_kg) + transport_per_kg + fee_per_kg, 2)
+    return LandedEstimate(
+        distance_km=dist_km,
+        distance_source="ESTIMATED_HAVERSINE",
+        transport_cost_per_kg=transport_per_kg,
+        platform_fee_per_kg=fee_per_kg,
+        landed_price_per_kg=landed_per_kg,
+        basis="ESTIMATE",
+    )
+
+
+def get_listing_detail(
+    db: Session,
+    listing_id: int,
+    current_user: User | None = None,
+    buyer_lat: float | None = None,
+    buyer_lng: float | None = None,
+) -> ListingDetailResponse:
     listing = db.query(Listing).filter(Listing.id == listing_id).first()
     if not listing:
         raise AppException(
@@ -201,8 +233,19 @@ def get_listing_detail(db: Session, listing_id: int) -> ListingDetailResponse:
         benchmark_source=benchmark_src,
     )
 
+    b_lat = buyer_lat
+    b_lng = buyer_lng
+    if b_lat is None and current_user and current_user.buyer_profile:
+        b_lat = current_user.buyer_profile.lat
+        b_lng = current_user.buyer_profile.lng
+
+    landed_estimate = None
+    if b_lat is not None and b_lng is not None:
+        vehicle_types = get_vehicle_types(db)
+        landed_estimate = compute_listing_landed_estimate(listing, b_lat, b_lng, vehicle_types)
+
     return ListingDetailResponse(
-        listing=build_listing_out(listing),
+        listing=build_listing_out(listing, landed_estimate=landed_estimate),
         benchmark_context=benchmark_context,
     )
 
@@ -344,13 +387,51 @@ def list_listings(
         min_harvest = today_ist() - timedelta(days=harvested_within_days)
         query = query.filter(Listing.harvest_date >= min_harvest)
 
+    b_lat = buyer_lat
+    b_lng = buyer_lng
+    if b_lat is None and current_user and current_user.buyer_profile:
+        b_lat = current_user.buyer_profile.lat
+        b_lng = current_user.buyer_profile.lng
+
     # Sorting
     if sort == "price":
         query = query.order_by(Listing.ask_price_per_kg.asc())
     elif sort == "freshness":
         query = query.order_by(Listing.harvest_date.desc())
+    elif sort in ["landed", "distance"] and b_lat is not None and b_lng is not None:
+        # Distance and Landed sorting require in-memory calculation
+        pass
     else:
         query = query.order_by(Listing.created_at.desc())
+
+    if b_lat is not None and b_lng is not None:
+        vehicle_types = get_vehicle_types(db)
+        if sort in ["landed", "distance"]:
+            all_candidates = query.all()
+            with_est = []
+            for item in all_candidates:
+                evaluate_listing_expiry(item, db)
+                est = compute_listing_landed_estimate(item, b_lat, b_lng, vehicle_types)
+                with_est.append((item, est))
+
+            if sort == "landed":
+                with_est.sort(key=lambda x: x[1].landed_price_per_kg)
+            elif sort == "distance":
+                with_est.sort(key=lambda x: x[1].distance_km)
+
+            total = len(with_est)
+            paged = with_est[offset : offset + limit]
+            items = [build_listing_out(item, landed_estimate=est) for item, est in paged]
+            return ListingListResponse(items=items, total=total)
+        else:
+            total = query.count()
+            listings = query.offset(offset).limit(limit).all()
+            items = []
+            for item in listings:
+                evaluate_listing_expiry(item, db)
+                est = compute_listing_landed_estimate(item, b_lat, b_lng, vehicle_types)
+                items.append(build_listing_out(item, landed_estimate=est))
+            return ListingListResponse(items=items, total=total)
 
     total = query.count()
     listings = query.offset(offset).limit(limit).all()

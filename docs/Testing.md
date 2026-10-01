@@ -203,5 +203,10 @@ All MUST ACs executed; any failure either fixed or recorded in Memory.md "Known 
 | 2026-10-01 | `ruff check .` (backend linter - Phase 4) | `All checks passed!` | Zero lint or formatting errors across all backend code and test files |
 | 2026-10-01 | `npm test` (frontend vitest - Phase 4) | `Test Files: 3 passed (3), Tests: 17 passed (17), Duration: 2.10s` | Buyer requirement validation rules, dynamic expiry, terminal state immutability, educational landed price formula, and coordinate bounds verified |
 | 2026-10-01 | `npm run build` (frontend bundle - Phase 4) | `✓ 1510 modules transformed. dist/assets/index-mYlNfQpy.js 262.27 kB (gzip: 73.31 kB). ✓ built in 5.43s` | Zero TypeScript or Vite compilation errors across new buyer pages, components, and router integration |
+| 2026-10-01 | `pytest -v` (backend suite - Phase 5) | `74 passed, 69 warnings in 17.62s` | AC-ORD-01..05 passed; Unified marketplace discovery, indicative landed price estimates, atomic reservation on Listing, concurrency-safe requirement fulfillment, order transition state machine (PLACED -> CONFIRMED / REJECTED / CANCELLED), financial snapshotting, object-level authorization, and seeded orders O1-O6 (CONFIRMED) & H1-H4 (DELIVERED) verified |
+| 2026-10-01 | `ruff check .` (backend linter - Phase 5) | `All checks passed!` | Zero lint or formatting errors across all backend code and test files |
+| 2026-10-01 | `npm test` (frontend vitest - Phase 5) | `Test Files: 4 passed (4), Tests: 22 passed (22), Duration: 1.46s` | Marketplace and order placement validation rules, landed cost formula with 2% fee, transition permissions, and requirement compatibility checks verified |
+| 2026-10-01 | `npm run build` (frontend bundle - Phase 5) | `✓ 1518 modules transformed. dist/assets/index-Bl-ZM4-m.js 303.11 kB (gzip: 80.76 kB). ✓ built in 5.26s` | Zero TypeScript or Vite compilation errors across MarketplacePage, OrdersPage, OrderDetailPage, and Order components |
+
 
 

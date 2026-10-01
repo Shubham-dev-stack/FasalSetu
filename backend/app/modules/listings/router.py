@@ -70,8 +70,20 @@ def get_all_listings(
 
 
 @router.get("/{listing_id}", response_model=ListingDetailResponse)
-def get_one_listing(listing_id: int, db: Session = Depends(get_db)):
-    return get_listing_detail(db, listing_id)
+def get_one_listing(
+    listing_id: int,
+    buyer_lat: float | None = Query(default=None),
+    buyer_lng: float | None = Query(default=None),
+    current_user: User | None = Depends(get_optional_current_user),
+    db: Session = Depends(get_db),
+):
+    return get_listing_detail(
+        db,
+        listing_id,
+        current_user=current_user,
+        buyer_lat=buyer_lat,
+        buyer_lng=buyer_lng,
+    )
 
 
 @router.patch("/{listing_id}", response_model=ListingOut)

@@ -33,8 +33,12 @@ export async function fetchListingsApi(params?: {
   grade_min?: string;
   state?: string;
   max_price?: number;
+  harvested_within_days?: number;
   status?: string;
   mine?: boolean;
+  sort?: string;
+  buyer_lat?: number;
+  buyer_lng?: number;
   limit?: number;
   offset?: number;
   token?: string | null;
@@ -44,8 +48,13 @@ export async function fetchListingsApi(params?: {
   if (params?.grade_min) query.append('grade_min', params.grade_min);
   if (params?.state) query.append('state', params.state);
   if (params?.max_price) query.append('max_price', String(params.max_price));
+  if (params?.harvested_within_days)
+    query.append('harvested_within_days', String(params.harvested_within_days));
   if (params?.status) query.append('status', params.status);
   if (params?.mine) query.append('mine', 'true');
+  if (params?.sort) query.append('sort', params.sort);
+  if (params?.buyer_lat !== undefined) query.append('buyer_lat', String(params.buyer_lat));
+  if (params?.buyer_lng !== undefined) query.append('buyer_lng', String(params.buyer_lng));
   if (params?.limit) query.append('limit', String(params.limit));
   if (params?.offset) query.append('offset', String(params.offset));
 
