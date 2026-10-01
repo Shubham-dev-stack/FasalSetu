@@ -439,3 +439,17 @@ def seed_reference_and_users(db: Session) -> dict:
         "users": len(producers_data) + len(buyers_data) + 1,
         "vehicles": len(vehicles_data),
     }
+
+
+def seed_synthetic_demand_and_prices(db: Session, seed: int = 42) -> dict[str, int]:
+    """Generate and persist synthetic demand panel and benchmark prices.
+
+    PROTECTS REAL AGMARKNET DATA: Only records where is_synthetic=True and
+    source='SYNTHETIC_DEMO' are cleared. Real snapshot rows remain untouched.
+    """
+    from ml.generate_data import generate_panels, save_datasets, seed_demand_and_prices
+
+    complete_df, post_drop_df, prices_df = generate_panels(seed=seed)
+    save_datasets(post_drop_df, complete_df, prices_df)
+    counts = seed_demand_and_prices(db, post_drop_df, prices_df)
+    return counts

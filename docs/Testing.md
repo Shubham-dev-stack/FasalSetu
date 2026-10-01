@@ -191,3 +191,8 @@ All MUST ACs executed; any failure either fixed or recorded in Memory.md "Known 
 | 2026-10-01 | `ruff check .` (backend linter) | `All checks passed!` | Zero lint or formatting errors across all backend code |
 | 2026-10-01 | `npm test` (frontend vitest) | `Test Files: 1 passed (1), Tests: 2 passed (2), Duration: 2.19s` | Demo persona specification and metadata validation |
 | 2026-10-01 | `npm run build` (frontend bundle) | `✓ 1494 modules transformed. dist/index.html 0.55 kB, dist/assets/index.js 192.65 kB (gzip: 60.76 kB). ✓ built in 24.47s` | Zero TypeScript or Vite compilation errors |
+| 2026-10-01 | `pytest -v` (backend suite - Phase 2) | `31 passed, 9 warnings in 9.38s` | AC-GEN-01..05 (18,250 pre-dropout panel, ~1% dropout, seed reproducibility, positive ranges, benchmark prices), AC-AGM-01..02 (mandi snapshot aggregation/kg conversion, snapshot preservation during synthetic reseeding) |
+| 2026-10-01 | `ruff check .` (backend linter - Phase 2) | `All checks passed!` | Zero lint or formatting errors across new Phase 2 code and tests |
+| 2026-10-01 | `npm test` (frontend vitest - Phase 2 regression) | `Test Files: 1 passed (1), Tests: 2 passed (2), Duration: 2.19s` | Frontend tests verified unaffected by data layer additions |
+| 2026-10-01 | `npm run build` (frontend bundle - Phase 2 regression) | `✓ 1494 modules transformed. dist/assets/index-CJ5Zz8SD.js 192.65 kB (gzip: 60.76 kB). ✓ built in 25.41s` | Frontend production bundle verified cleanly compiling |
+

@@ -8,3 +8,6 @@ ignore = [
     "B008",  # FastAPI Depends in function argument defaults
     "E501",  # Line length handled by formatter
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

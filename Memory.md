@@ -1,6 +1,6 @@
 # Memory.md — FasalSetu permanent project state
 
-Update rules: Execution.md §8. Never record results that were not produced by an executed command. Last updated: 2026-10-01 (Phase 1 completion).
+Update rules: Execution.md §8. Never record results that were not produced by an executed command. Last updated: 2026-10-01 (Phase 2 completion).
 
 ## 1. Project identity
 
@@ -18,10 +18,11 @@ Update rules: Execution.md §8. Never record results that were not produced by a
 | Item | State |
 |---|---|
 | Documentation package (14 files + AGENTS.md) | **Complete** (moved to `docs/` with README, Memory, AGENTS at root) |
-| Source code | **Phase 1 complete** (Foundation + 15 DB models + Seed + Auth + Logistics Utils + Reference API + Frontend AppShell & Login) |
-| Current implementation phase | **Phase 1 complete — next: Phase 2** (Synthetic Data Generator + Agmarknet Ingestion) |
-| Tests executed | **24 backend tests passed** (`pytest -v`), **2 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
-| Measured metrics | **None** (no model trained yet; planned Phase 3) |
+| Source code | **Phase 2 complete** (Synthetic Demand Generator + Benchmark Price Generator + Agmarknet Snapshot Ingestion + Seed Integration) |
+| Current implementation phase | **Phase 2 complete — next: Phase 3** (Producer / Farmer / FPO Module) |
+| Tests executed | **31 backend tests passed** (`pytest -v`), **2 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
+| Measured metrics | **Data generation verified**: 18,250 pre-dropout panel rows, ~1% dropout (18,078 rows), 2,250 synthetic benchmark price rows seeded; Agmarknet mandi parsing & snapshot preservation verified |
+
 
 ## 3. Completed documentation
 
@@ -91,8 +92,9 @@ None (no code exists).
 Completed:
 - Phase 0: System skeleton, initial setup, health endpoint, directory layout.
 - Phase 1: Database schema (15 models), seed logic (12 users, 5 crops, 5 hubs, 5 vehicles), auth service & endpoints (/login, /demo-login, /me, /register), reference endpoints (/reference), logistics cost calculator, geo utilities, custom errors, frontend auth context, LoginPage with 6 demo personas, AppShell with role-based navigation and DEMO DATA badge.
+- Phase 2: Synthetic demand generator (`generate_data.py`), benchmark price generator (`DEMO-PRICE-ANCHOR`), Agmarknet snapshot ingestion script (`ingest_agmarknet.py`), seed integration, generator configuration (`generator.yaml`, `market_hub_map.csv`), deterministic dropout, seed reproducibility, snapshot preservation guarantees.
 
-Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 2 through 12).
+Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 3 through 13).
 
 ## 12. Future work
 
@@ -100,8 +102,9 @@ PRD §18. Highlights: real demand data, Agmarknet/eNAM feeds, payments, individu
 
 ## 13. Next action
 
-1. Proceed to **Phase 2** (Execution.md & Phases.md §4): Synthetic Data Generator (`ml/generate_data.py`, `backend/config/generator.yaml`) + optional Agmarknet snapshot ingestion script.
-2. Verify AC-GEN-01..07.
+1. Proceed to **Phase 3** (Phases.md §5): Producer / Farmer / FPO Module (Produce Listing Lifecycle + Fair Price Band Advisor + Farmer Dashboard UI).
+2. Implement backend listing endpoints, fair price engine, and frontend Farmer views.
+
 
 ## 14. Decisions that must NOT be repeated / re-opened
 

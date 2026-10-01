@@ -1,10 +1,10 @@
 import argparse
 
 from app.core.database import Base, SessionLocal, engine
-from app.db.seed import seed_reference_and_users
+from app.db.seed import seed_reference_and_users, seed_synthetic_demand_and_prices
 
 
-def setup_demo(retrain: bool = False):
+def setup_demo(retrain: bool = False, generate_data: bool = True):
     print("Setting up FasalSetu demo database...")
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
@@ -13,9 +13,16 @@ def setup_demo(retrain: bool = False):
     db = SessionLocal()
     try:
         counts = seed_reference_and_users(db)
-        print("Seeding completed successfully:")
+        print("Seeding reference and user entities completed:")
         for k, v in counts.items():
             print(f"  - {k}: {v}")
+
+        if generate_data:
+            print("Generating synthetic demand panel and benchmark prices...")
+            gen_counts = seed_synthetic_demand_and_prices(db)
+            print("Synthetic data seeded:")
+            for k, v in gen_counts.items():
+                print(f"  - {k}: {v}")
     finally:
         db.close()
 

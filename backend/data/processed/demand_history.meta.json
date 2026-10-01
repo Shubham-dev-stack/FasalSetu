@@ -1,0 +1,16 @@
+{
+  "dataset_id": "DS-01",
+  "data_source": "SYNTHETIC",
+  "generator_version": "1.0",
+  "seed": 42,
+  "pre_dropout_rows": 18250,
+  "post_dropout_rows": 18062,
+  "dropped_rows": 188,
+  "dropout_rate_pct": 1.03,
+  "num_hubs": 5,
+  "num_crops": 5,
+  "start_date": "2024-10-01",
+  "end_date": "2026-09-30",
+  "generated_at": "2026-10-01T06:42:12.841502+00:00",
+  "disclaimer": "Demand history is synthetic, generated from a documented process. Forecast metrics validate the pipeline, not real-world accuracy."
+}

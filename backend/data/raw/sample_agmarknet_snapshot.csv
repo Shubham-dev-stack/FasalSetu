@@ -1,0 +1,12 @@
+State,District,Market,Commodity,Variety,Grade,Arrival_Date,Min_Price,Max_Price,Modal_Price
+Delhi,Delhi,Azadpur,Tomato,Hybrid,FAQ,2026-09-25,2200,2800,2500
+Delhi,Delhi,Azadpur,Tomato,Deshi,FAQ,2026-09-25,2000,2600,2300
+Delhi,Delhi,Azadpur,Onion,Nasik,FAQ,2026-09-25,1900,2400,2200
+Delhi,Delhi,Azadpur,Potato,Jyoti,FAQ,2026-09-25,1600,2000,1800
+Haryana,Gurgaon,Gurgaon,Cauliflower,Local,FAQ,2026-09-25,2600,3200,2900
+Haryana,Gurgaon,Gurgaon,Green Chilli,Local,FAQ,2026-09-25,4000,5000,4600
+Uttar Pradesh,Gautam Budh Nagar,Noida,Tomato,Deshi,FAQ,2026-09-26,2100,2700,2400
+Uttar Pradesh,Ghaziabad,Sahibabad,Onion,Local,FAQ,2026-09-26,2000,2500,2300
+Haryana,Faridabad,Faridabad,Potato,Local,FAQ,2026-09-26,1700,2100,1900
+Punjab,Amritsar,Amritsar,Wheat,Sharbati,FAQ,2026-09-26,2400,2800,2600
+Delhi,Delhi,Azadpur,Tomato,Deshi,FAQ,2026-09-27,-500,2000,1500
