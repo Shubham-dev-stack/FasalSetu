@@ -50,7 +50,7 @@ Excluded on purpose: festival/holiday flags (no sourced calendar; FUTURE), weath
 
 No large hyper-parameter search (small grid over `num_leaves ∈ {15,31,63}` is allowed, chosen on validation MAE only).
 
-**Deployment gate (honesty control):** deploy LightGBM only if `val_MAE(LGBM) < 0.95 × min(val_MAE(B1), val_MAE(B2))` **and** `test_MAE(LGBM) < min(test_MAE(B1), test_MAE(B2))`. Otherwise `model_card.deployed_method = "SEASONAL_NAIVE"` and the UI shows the fallback label. After the gate passes, the point and quantile models are **refit on train+validation+test** for deployment; reported metrics are from the train-only fit.
+**Deployment gate (honesty control):** deploy LightGBM only if `val_MAE(LGBM) < 0.95 × min(val_MAE(B1), val_MAE(B2))` **and** `test_MAE(LGBM) < min(test_MAE(B1), test_MAE(B2))`. Otherwise `model_card.deployed_method = "SEASONAL_NAIVE"` and the UI shows the fallback label. After the gate passes, the point and quantile models are **refit on train+validation ONLY** for deployment (the held-out test set is strictly excluded from training); reported metrics are from the validation and held-out test splits.
 
 ## 6. Evaluation metrics
 
@@ -65,7 +65,29 @@ Reported overall and per crop, on validation and test, for baselines and LightGB
 | Bias | mean(ŷ − y) |
 | Interval coverage | share of test rows with q10 ≤ y ≤ q90 (nominal 80%) — reported as measured, **not** claimed calibrated |
 
-Nothing is written into docs, UI or pitch until produced by `python -m ml.train` and stored in `model_card.json` (Rules.md).
+### Measured Results (`python -m ml.train` on Dataset DS-01)
+
+- Dataset SHA256: `212f40084745d2e23e69e35ecc812b77c5164e4a96fba155aa7ffdad0139b755`
+- Model Version: `1.0.0`
+- Deployed Method: `LIGHTGBM`
+- Deployed Scope: `TRAIN_PLUS_VALIDATION_ONLY`
+- Deployment Gate: **PASSED** (val_MAE 105.42 < 127.81 threshold; test_MAE 104.66 < 126.45 baseline)
+
+| Split | Model | MAE (kg/d) | RMSE (kg/d) | WAPE % | MAPE % | Bias | 80% Coverage |
+|---|---|---|---|---|---|---|---|
+| Validation | **LightGBM** | **105.42** | 165.91 | 10.62% | 11.16% | -8.57 | 77.91% |
+| Validation | B1 Seasonal Naive | 142.89 | 230.39 | 14.40% | 14.91% | 12.57 | — |
+| Validation | B2 Trailing Mean | 134.54 | 212.54 | 13.56% | 14.32% | 14.64 | — |
+| Test (Held-out) | **LightGBM** | **104.66** | 173.67 | 11.12% | 10.65% | -13.62 | 79.62% |
+| Test (Held-out) | B1 Seasonal Naive | 137.55 | 226.63 | 14.62% | 14.11% | 3.81 | — |
+| Test (Held-out) | B2 Trailing Mean | 126.45 | 202.99 | 13.44% | 13.62% | 11.97 | — |
+
+Per-crop held-out test performance (LGBM):
+- Tomato: MAE 89.50 kg/d, WAPE 9.77%, 80% Coverage 81.29%
+- Onion: MAE 197.61 kg/d, WAPE 11.61%, 80% Coverage 72.66%
+- Potato: MAE 190.60 kg/d, WAPE 11.58%, 80% Coverage 74.10%
+- Cauliflower: MAE 27.76 kg/d, WAPE 10.36%, 80% Coverage 84.17%
+- Green Chilli: MAE 15.90 kg/d, WAPE 10.18%, 80% Coverage 86.03%
 
 ## 7. Confidence / uncertainty
 

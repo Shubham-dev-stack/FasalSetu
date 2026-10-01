@@ -1,0 +1,27 @@
+{
+  "model_version": "1.0.0",
+  "created_at": "2026-10-01T10:14:46.073252+00:00",
+  "feature_columns": [
+    "hub_id",
+    "crop_id",
+    "dow",
+    "month",
+    "week_of_year",
+    "is_weekend",
+    "doy_sin",
+    "doy_cos",
+    "lag_7",
+    "lag_14",
+    "lag_28",
+    "roll_mean_7",
+    "roll_std_7",
+    "roll_mean_28",
+    "price_lag_7",
+    "price_roll_mean_7",
+    "price_change_7"
+  ],
+  "categorical_columns": [
+    "hub_id",
+    "crop_id"
+  ]
+}

@@ -425,4 +425,87 @@ export interface OrderListResponse {
   total: number;
 }
 
+export interface ForecastHistoryItem {
+  date: string;
+  demand_kg: number;
+  is_synthetic: boolean;
+}
+
+export interface ForecastDailyItem {
+  date: string;
+  day_of_week: string;
+  point_forecast_kg: number;
+  interval_lo_kg?: number | null;
+  interval_hi_kg?: number | null;
+}
+
+export interface ForecastDemandResponse {
+  hub_id: number;
+  hub_name: string;
+  crop_id: number;
+  crop_name: string;
+  cutoff_date: string;
+  horizon_days: number;
+  method: string;
+  model_version: string;
+  demand_data_source: string;
+  price_feature_sources: string[];
+  reproducibility: string;
+  disclaimer: string;
+  history: ForecastHistoryItem[];
+  forecast: ForecastDailyItem[];
+}
+
+export interface HubOpportunityItem {
+  hub_id: number;
+  hub_name: string;
+  state: string;
+  lat: number;
+  lng: number;
+  total_forecast_kg: number;
+  avg_daily_forecast_kg: number;
+  active_supply_kg: number;
+  supply_demand_ratio: number;
+  opportunity_label: 'HIGH_DEFICIT' | 'BALANCED' | 'OVERSUPPLIED' | string;
+  method: string;
+}
+
+export interface ForecastHubsResponse {
+  crop_id: number;
+  crop_name: string;
+  cutoff_date: string;
+  horizon_days: number;
+  demand_data_source: string;
+  disclaimer: string;
+  hubs: HubOpportunityItem[];
+}
+
+export interface ModelInfoResponse {
+  model_id: string;
+  model_version: string;
+  trained_at: string;
+  git_commit: string;
+  dataset_hash_sha256: string;
+  generator_version: string;
+  demand_data_source: string;
+  price_feature_sources: string[];
+  reproducibility: string;
+  deployed_method: string;
+  deployment_gate: {
+    passed: boolean;
+    deployed_method: string;
+    reason: string;
+    val_mae_lgbm?: number;
+    min_val_baseline?: number;
+    test_mae_lgbm?: number;
+    min_test_baseline?: number;
+  };
+  metrics: {
+    validation: Record<string, any>;
+    test: Record<string, any>;
+  };
+  split_spec: Record<string, any>;
+  disclaimer: string;
+}
+
 

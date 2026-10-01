@@ -1,11 +1,23 @@
 from datetime import timedelta
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.core.database import SessionLocal
 from app.core.dates import today_ist
 from app.db.models import Listing, Requirement
+from app.db.seed import seed_demo_orders
 from app.main import create_app
+
+
+@pytest.fixture(autouse=True)
+def clean_orders_state():
+    yield
+    db = SessionLocal()
+    try:
+        seed_demo_orders(db)
+    finally:
+        db.close()
 
 
 def get_token(client: TestClient, persona: str) -> str:

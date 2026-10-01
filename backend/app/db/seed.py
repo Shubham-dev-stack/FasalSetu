@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -600,6 +601,20 @@ def seed_demo_orders(db: Session) -> dict[str, int]:
     operator = db.query(User).filter(User.email == CANONICAL_PERSONAS["operator"]).first()
     operator_id = operator.id if operator else 1
 
+    # Remove any test-created orders beyond canonical seed (id > 10)
+    extra_orders = db.query(Order).filter(Order.id > 10).all()
+    for extra_order in extra_orders:
+        db.query(OrderEvent).filter(OrderEvent.order_id == extra_order.id).delete()
+        db.delete(extra_order)
+    db.flush()
+
+    # Reset all listings to initial quantity before applying canonical seed reservations
+    all_listings = db.query(Listing).all()
+    for l_item in all_listings:
+        l_item.quantity_available_kg = l_item.quantity_kg
+        l_item.status = "ACTIVE"
+    db.flush()
+
     # O1-O6: routing pool (status CONFIRMED, no shipment, origin MARKETPLACE)
     # H1-H4: historical orders (status DELIVERED, delivered 2-10 days ago, no shipment, origin MARKETPLACE)
     orders_data = [
@@ -727,5 +742,26 @@ def seed_demo_orders(db: Session) -> dict[str, int]:
 
     db.commit()
     return {"orders": count}
+
+
+def seed_all(db: Session) -> dict[str, Any]:
+    """Execute complete deterministic seed pipeline in proper relational order."""
+    r1 = seed_reference_and_users(db)
+    r2 = seed_synthetic_demand_and_prices(db)
+    r3 = seed_demo_listings(db)
+    r4 = seed_demo_requirements(db)
+    r5 = seed_demo_orders(db)
+    return {**r1, **r2, **r3, **r4, **r5}
+
+
+if __name__ == "__main__":
+    from app.core.database import SessionLocal
+
+    session = SessionLocal()
+    try:
+        results = seed_all(session)
+        print("Database seeded successfully:", results)
+    finally:
+        session.close()
 
 

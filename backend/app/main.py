@@ -6,11 +6,13 @@ from app.core.config import get_settings
 from app.core.database import SessionLocal
 from app.core.errors import register_error_handlers
 from app.modules.auth.router import router as auth_router
+from app.modules.forecasting.router import router as forecasting_router
 from app.modules.listings.router import router as listings_router
 from app.modules.orders.router import router as orders_router
 from app.modules.profiles.router import router as profiles_router
 from app.modules.reference.router import router as reference_router
 from app.modules.requirements.router import router as requirements_router
+from ml.predict import get_model_artifacts
 
 
 def create_app() -> FastAPI:
@@ -47,12 +49,20 @@ def create_app() -> FastAPI:
         except Exception:
             db_status = "error"
 
+        artifacts = get_model_artifacts()
+        model_loaded = artifacts is not None
+        deployed_method = (
+            artifacts["model_card"].get("deployed_method", "NONE")
+            if artifacts
+            else "NONE"
+        )
+
         return {
             "status": "ok",
             "db": db_status,
             "model": {
-                "loaded": False,
-                "deployed_method": "NONE",
+                "loaded": model_loaded,
+                "deployed_method": deployed_method,
             },
             "demo_mode": settings.DEMO_MODE,
             "version": "0.1.0",
@@ -65,9 +75,11 @@ def create_app() -> FastAPI:
     app.include_router(listings_router, prefix="/api/v1")
     app.include_router(requirements_router, prefix="/api/v1")
     app.include_router(orders_router, prefix="/api/v1")
+    app.include_router(forecasting_router, prefix="/api/v1")
 
     return app
 
 
 
 app = create_app()
+

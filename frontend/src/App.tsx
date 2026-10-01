@@ -14,6 +14,7 @@ import { BuyerProfilePage } from './pages/buyer/BuyerProfilePage';
 import { MarketplacePage } from './pages/market/MarketplacePage';
 import { OrdersPage } from './pages/orders/OrdersPage';
 import { OrderDetailPage } from './pages/orders/OrderDetailPage';
+import { ForecastPage } from './pages/forecast/ForecastPage';
 
 const ProtectedLayout: React.FC<{ children: React.ReactNode; title?: string }> = ({
   children,
@@ -153,11 +154,7 @@ export default function App() {
             path="/forecast"
             element={
               <ProtectedLayout title="Demand Intelligence">
-                <PlaceholderPage
-                  title="Demand Intelligence"
-                  phase="Phase 6 — ML Demand Forecast"
-                  description="7-day demand projections across regional hubs powered by LightGBM model inferences."
-                />
+                <ForecastPage />
               </ProtectedLayout>
             }
           />

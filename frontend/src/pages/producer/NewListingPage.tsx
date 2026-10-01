@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/auth';
 import { createListingApi } from '../../api/listings';
-import { DemandPanelPlaceholder } from '../../components/domain/DemandPanelPlaceholder';
+import { DemandPanel } from '../../components/domain/DemandPanel';
 import { ArrowLeft, AlertTriangle, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const CROPS = [
@@ -344,8 +344,9 @@ export const NewListingPage: React.FC = () => {
 
         {/* Right Side: Demand Panel & Benchmark Context */}
         <div className="lg:col-span-5 space-y-4">
-          <DemandPanelPlaceholder
-            selectedCropName={selectedCrop.name}
+          <DemandPanel
+            cropId={selectedCrop.id}
+            cropName={selectedCrop.name}
             approxBenchmarkModal={benchmarkModal}
           />
         </div>

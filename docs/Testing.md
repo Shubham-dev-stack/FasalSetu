@@ -207,6 +207,13 @@ All MUST ACs executed; any failure either fixed or recorded in Memory.md "Known 
 | 2026-10-01 | `ruff check .` (backend linter - Phase 5) | `All checks passed!` | Zero lint or formatting errors across all backend code and test files |
 | 2026-10-01 | `npm test` (frontend vitest - Phase 5) | `Test Files: 4 passed (4), Tests: 22 passed (22), Duration: 1.46s` | Marketplace and order placement validation rules, landed cost formula with 2% fee, transition permissions, and requirement compatibility checks verified |
 | 2026-10-01 | `npm run build` (frontend bundle - Phase 5) | `✓ 1518 modules transformed. dist/assets/index-Bl-ZM4-m.js 303.11 kB (gzip: 80.76 kB). ✓ built in 5.26s` | Zero TypeScript or Vite compilation errors across MarketplacePage, OrdersPage, OrderDetailPage, and Order components |
+| 2026-10-01 | `pytest -v tests/unit/test_forecast_ml.py` | `5 passed in 4.42s` | AC-FC-04 (strictly causal imputation, future leakage invariance), AC-FC-08 (pure metric functions hand-computed fixtures), AC-FC-09 (honesty deployment gate logic), chronological split temporal separation, quantile monotonicity |
+| 2026-10-01 | `python -m ml.train` | `Point iteration 138, Val MAE: LGBM=105.42 (B2=134.54), Test MAE: LGBM=104.66 (B2=126.45), Gate Passed: True` | Model trained on Train, evaluated on Val & held-out Test; deployed model refit on Train+Val ONLY. Artifacts saved: model_point, model_q10, model_q90, feature_spec.json, model_card.json |
+| 2026-10-01 | `pytest -v tests/api/test_forecasts.py` | `7 passed, 2 warnings in 13.90s` | AC-FC-01 (point + 80% interval), AC-FC-02/06 (seasonal naive fallback), AC-FC-03 (404s), AC-FC-05 (model card metadata), AC-FC-07 & Rule D-026 (nearest hub supply attribution without double-counting) |
+| 2026-10-01 | `pytest -v` (backend suite - Phase 6) | `86 passed, 70 warnings in 41.62s` | All 86 backend tests passing; zero regressions across Auth, Profiles, Listings, Requirements, Orders, Marketplace, ML & Forecasting |
+| 2026-10-01 | `ruff check .` (backend linter - Phase 6) | `All checks passed!` | Zero lint or formatting errors across all backend code and test files |
+| 2026-10-01 | `npm test -- --run` (frontend vitest - Phase 6) | `Test Files: 5 passed (5), Tests: 27 passed (27), Duration: 12.89s` | AC-FC-01..07 client domain rules, horizon validation, interval monotonicity, Rule D-026 supply attribution, fallback null intervals verified |
+| 2026-10-01 | `npm run build` (frontend bundle - Phase 6) | `✓ 2320 modules transformed. dist/assets/index-DpqPDomn.js 743.07 kB (gzip: 199.97 kB). ✓ built in 18.02s` | Zero TypeScript or Vite compilation errors across ForecastPage, ForecastChart, DemandPanel, ModelInfoModal |
 
 
 

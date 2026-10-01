@@ -1,0 +1,171 @@
+{
+  "model_id": "MOD-01",
+  "model_version": "1.0.0",
+  "trained_at": "2026-10-01T10:14:46.076253+00:00",
+  "git_commit": "234efe7",
+  "dataset_hash_sha256": "212f40084745d2e23e69e35ecc812b77c5164e4a96fba155aa7ffdad0139b755",
+  "generator_version": "1.0",
+  "demand_data_source": "SYNTHETIC",
+  "price_feature_sources": [
+    "SYNTHETIC_DEMO",
+    "AGMARKNET_SNAPSHOT"
+  ],
+  "reproducibility": "Reproducible within the pinned project environment, dependency versions, dataset, generator version, and fixed seed.",
+  "deployed_method": "LIGHTGBM",
+  "deployment_gate": {
+    "passed": true,
+    "deployed_method": "LIGHTGBM",
+    "reason": "LGBM validation MAE (105.42) beats best baseline (134.54) by >5% (threshold 127.81) and test MAE (104.66) beats best baseline test MAE (126.45).",
+    "val_mae_lgbm": 105.42,
+    "min_val_baseline": 134.54,
+    "test_mae_lgbm": 104.66,
+    "min_test_baseline": 126.45
+  },
+  "split_spec": {
+    "train_end": "2026-07-08",
+    "val_start": "2026-07-09",
+    "val_end": "2026-09-02",
+    "test_start": "2026-09-03",
+    "test_end": "2026-09-30",
+    "deployment_training_scope": "TRAIN_PLUS_VALIDATION_ONLY"
+  },
+  "metrics": {
+    "validation": {
+      "lgbm": {
+        "mae": 105.42,
+        "rmse": 165.91,
+        "wape_pct": 10.62,
+        "mape_pct": 11.16,
+        "bias": -8.57,
+        "coverage_80_pct": 77.91
+      },
+      "b1_seasonal_naive": {
+        "mae": 142.89,
+        "rmse": 230.39,
+        "wape_pct": 14.4,
+        "mape_pct": 14.91,
+        "bias": 12.57,
+        "coverage_80_pct": null
+      },
+      "b2_trailing_mean": {
+        "mae": 134.54,
+        "rmse": 212.54,
+        "wape_pct": 13.56,
+        "mape_pct": 14.32,
+        "bias": 14.64,
+        "coverage_80_pct": null
+      },
+      "by_crop_lgbm": {
+        "Tomato": {
+          "mae": 125.19,
+          "rmse": 168.75,
+          "wape_pct": 11.76,
+          "mape_pct": 12.0,
+          "bias": 5.07,
+          "coverage_80_pct": 69.18
+        },
+        "Onion": {
+          "mae": 186.53,
+          "rmse": 244.93,
+          "wape_pct": 10.55,
+          "mape_pct": 10.27,
+          "bias": -49.89,
+          "coverage_80_pct": 75.81
+        },
+        "Potato": {
+          "mae": 163.81,
+          "rmse": 215.24,
+          "wape_pct": 9.54,
+          "mape_pct": 9.76,
+          "bias": 4.49,
+          "coverage_80_pct": 82.42
+        },
+        "Cauliflower": {
+          "mae": 33.63,
+          "rmse": 46.42,
+          "wape_pct": 12.49,
+          "mape_pct": 12.5,
+          "bias": 5.59,
+          "coverage_80_pct": 75.27
+        },
+        "Green Chilli": {
+          "mae": 18.1,
+          "rmse": 27.71,
+          "wape_pct": 12.25,
+          "mape_pct": 11.23,
+          "bias": -7.93,
+          "coverage_80_pct": 87.0
+        }
+      }
+    },
+    "test": {
+      "lgbm": {
+        "mae": 104.66,
+        "rmse": 173.67,
+        "wape_pct": 11.12,
+        "mape_pct": 10.65,
+        "bias": -13.62,
+        "coverage_80_pct": 79.62
+      },
+      "b1_seasonal_naive": {
+        "mae": 137.55,
+        "rmse": 226.63,
+        "wape_pct": 14.62,
+        "mape_pct": 14.11,
+        "bias": 3.81,
+        "coverage_80_pct": null
+      },
+      "b2_trailing_mean": {
+        "mae": 126.45,
+        "rmse": 202.99,
+        "wape_pct": 13.44,
+        "mape_pct": 13.62,
+        "bias": 11.97,
+        "coverage_80_pct": null
+      },
+      "by_crop_lgbm": {
+        "Tomato": {
+          "mae": 89.5,
+          "rmse": 116.62,
+          "wape_pct": 9.77,
+          "mape_pct": 9.96,
+          "bias": 5.22,
+          "coverage_80_pct": 81.29
+        },
+        "Onion": {
+          "mae": 197.61,
+          "rmse": 264.11,
+          "wape_pct": 11.61,
+          "mape_pct": 11.47,
+          "bias": -44.01,
+          "coverage_80_pct": 72.66
+        },
+        "Potato": {
+          "mae": 190.6,
+          "rmse": 254.64,
+          "wape_pct": 11.58,
+          "mape_pct": 11.32,
+          "bias": -24.22,
+          "coverage_80_pct": 74.1
+        },
+        "Cauliflower": {
+          "mae": 27.76,
+          "rmse": 38.53,
+          "wape_pct": 10.36,
+          "mape_pct": 10.48,
+          "bias": -1.03,
+          "coverage_80_pct": 84.17
+        },
+        "Green Chilli": {
+          "mae": 15.9,
+          "rmse": 22.12,
+          "wape_pct": 10.18,
+          "mape_pct": 10.01,
+          "bias": -3.83,
+          "coverage_80_pct": 86.03
+        }
+      }
+    }
+  },
+  "disclaimer": "Demand history is synthetic, generated from a documented process. Forecast metrics validate the pipeline, not real-world accuracy."
+}

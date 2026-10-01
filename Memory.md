@@ -18,10 +18,10 @@ Update rules: Execution.md §8. Never record results that were not produced by a
 | Item | State |
 |---|---|
 | Documentation package (14 files + AGENTS.md) | **Complete** (moved to `docs/` with README, Memory, AGENTS at root) |
-| Source code | **Phase 5 complete** (Unified Marketplace + Discovery + Order Placement + Order Lifecycle State Machine + Seed Orders O1-O6 & H1-H4 + Orders UI) |
-| Current implementation phase | **Phase 5 complete — next: Phase 6** (Demand Intelligence / ML Demand Forecast) |
-| Tests executed | **74 backend tests passed** (`pytest -v`), **22 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
-| Measured metrics | **Marketplace & Orders verified**: 14 listings browsable with indicative landed prices; direct order placement with atomic conditional reservation on Listing; financial snapshotting (farmgate, dedicated haulage estimate, 2% platform fee); strict requirement compatibility validation; concurrency-safe requirement fulfillment; transition state machine with role-based authorization; deterministic seed orders O1-O6 (CONFIRMED) and H1-H4 (DELIVERED) |
+| Source code | **Phase 6 complete** (Demand Forecasting ML Pipeline + Strictly Causal Imputation + Train+Val Fit + Honesty Gate + Forecast Endpoints + TimedCache 1h TTL + Rule D-026 Nearest-Hub Supply Attribution + Forecast UI & Charting + Model Card Modal) |
+| Current implementation phase | **Phase 6 complete — next: Phase 7** (Deterministic Matching Engine) |
+| Tests executed | **86 backend tests passed** (`pytest -v`), **27 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
+| Measured metrics | **Demand Forecasting verified**: LightGBM direct point + quantile models trained on Train split, evaluated on Val & held-out Test, deployed model refit on **Train+Val ONLY**. Gate **PASSED** (val_MAE 105.42 vs B2 134.54; test_MAE 104.66 vs B2 126.45; test 80% interval coverage 79.62%). Zero future leakage verified under causal forward-fill imputation. Rule D-026 supply attribution strictly allocates active lots to nearest hub center. Seasonal naive fallback operational for history <35 days with null interval bounds. |
 
 
 
