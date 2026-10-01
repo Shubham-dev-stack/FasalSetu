@@ -1,12 +1,12 @@
-# Memory.md — KrishiSetu permanent project state
+# Memory.md — FasalSetu permanent project state
 
-Update rules: Execution.md §8. Never record results that were not produced by an executed command. Last updated: 2026-10-01 (documentation session).
+Update rules: Execution.md §8. Never record results that were not produced by an executed command. Last updated: 2026-10-01 (Phase 1 completion).
 
 ## 1. Project identity
 
 | Field | Value |
 |---|---|
-| Project | KrishiSetu (working title) — AI-assisted direct agricultural supply-chain coordination platform |
+| Project | FasalSetu — AI-assisted direct agricultural supply-chain coordination platform |
 | Hackathon | Smart India Hackathon 2026 — **SIH26033** "Multiple intermediaries reduce farmers earnings and increase consumer prices" |
 | Creator / org | Sarim Moin — Ministry of Consumer Affairs, Food & Public Distribution; dept: Ministry of Education's Innovation Cell (MIC); bucket: Agriculture, FoodTech & Rural Development; category: Software |
 | Sole developer / owner | Shubham Kumar (no parallel coding) |
@@ -18,10 +18,10 @@ Update rules: Execution.md §8. Never record results that were not produced by a
 | Item | State |
 |---|---|
 | Documentation package (14 files + AGENTS.md) | **Complete** (moved to `docs/` with README, Memory, AGENTS at root) |
-| Source code | **Phase 0 skeleton complete** (backend FastAPI app + frontend Vite React TS) |
-| Current implementation phase | **Phase 0 complete — next: Phase 1** (Foundation + DB + auth + logistics utils) |
-| Tests executed | **AC-SYS-01 passed** (`pytest -q` on health endpoint: 1 passed) |
-| Measured metrics | **None** (no model trained, no solver run) |
+| Source code | **Phase 1 complete** (Foundation + 15 DB models + Seed + Auth + Logistics Utils + Reference API + Frontend AppShell & Login) |
+| Current implementation phase | **Phase 1 complete — next: Phase 2** (Synthetic Data Generator + Agmarknet Ingestion) |
+| Tests executed | **24 backend tests passed** (`pytest -v`), **2 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
+| Measured metrics | **None** (no model trained yet; planned Phase 3) |
 
 ## 3. Completed documentation
 
@@ -88,8 +88,11 @@ None (no code exists).
 
 ## 11. Completed / incomplete features
 
-Completed: none (documentation only).
-Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15.
+Completed:
+- Phase 0: System skeleton, initial setup, health endpoint, directory layout.
+- Phase 1: Database schema (15 models), seed logic (12 users, 5 crops, 5 hubs, 5 vehicles), auth service & endpoints (/login, /demo-login, /me, /register), reference endpoints (/reference), logistics cost calculator, geo utilities, custom errors, frontend auth context, LoginPage with 6 demo personas, AppShell with role-based navigation and DEMO DATA badge.
+
+Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 2 through 12).
 
 ## 12. Future work
 
@@ -97,9 +100,8 @@ PRD §18. Highlights: real demand data, Agmarknet/eNAM feeds, payments, individu
 
 ## 13. Next action
 
-1. Proceed to **Phase 1** (Execution.md & Phases.md §3): Foundation + database (15 tables) + auth + pure logistics utils.
-2. Confirm Python 3.12 wheel installations verified: `ortools 9.15.6755`, `lightgbm 4.7.0`, `fastapi 0.142.2`, `SQLAlchemy 2.1.1`.
-3. Re-verify S-1, S-6, S-12 in Research §12 and the SIH26033 text on the portal before final submission.
+1. Proceed to **Phase 2** (Execution.md & Phases.md §4): Synthetic Data Generator (`ml/generate_data.py`, `backend/config/generator.yaml`) + optional Agmarknet snapshot ingestion script.
+2. Verify AC-GEN-01..07.
 
 ## 14. Decisions that must NOT be repeated / re-opened
 

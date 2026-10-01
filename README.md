@@ -1,6 +1,6 @@
-# KrishiSetu (working title) — SIH26033
+# FasalSetu — SIH26033
 
-AI-assisted direct agricultural supply-chain coordination platform. **Status: documentation complete; no code written yet** (everything below marked PLANNED until built — see `Memory.md`).
+AI-assisted direct agricultural supply-chain coordination platform. **Status: Phase 0 and Phase 1 completed** (see `Memory.md`).
 
 ## 1. Project overview
 

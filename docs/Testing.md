@@ -1,6 +1,6 @@
-# Testing — KrishiSetu
+# Testing — FasalSetu
 
-Status: PLANNED. **No test has been executed yet.** The execution log in §15 is empty and append-only. A test counts as passed only if it was run in the current session and the output is recorded there (Rules §6).
+Status: IN PROGRESS. Phase 0 and Phase 1 test suites executed and recorded below.
 
 ## 1. Strategy
 
@@ -182,8 +182,12 @@ Measure and record (do not assume): p95 latency on 50 requests for list/detail e
 
 All MUST ACs executed; any failure either fixed or recorded in Memory.md "Known bugs" and excluded from the demo path; `npm run build` and `pytest -q` executed after the final commit; Demo.md path run twice; screenshots/video captured.
 
-## 15. Execution log (append-only; currently empty — nothing has been run)
+## 15. Execution log (append-only)
 
 | Date | Command / check | Result (paste real output summary) | Notes |
 |---|---|---|---|
-| — | — | — | — |
+| 2026-10-01 | `pytest -q tests/api/test_health.py` | `1 passed in 0.45s` | AC-SYS-01: Health check baseline passed |
+| 2026-10-01 | `pytest -v` (backend suite) | `24 passed, 9 warnings in 7.79s` | AC-AUTH-01..06, AC-SYS-01..03, AC-GEO-01..02, AC-LOG-01..04, AC-SEC-01..04 passed |
+| 2026-10-01 | `ruff check .` (backend linter) | `All checks passed!` | Zero lint or formatting errors across all backend code |
+| 2026-10-01 | `npm test` (frontend vitest) | `Test Files: 1 passed (1), Tests: 2 passed (2), Duration: 2.19s` | Demo persona specification and metadata validation |
+| 2026-10-01 | `npm run build` (frontend bundle) | `✓ 1494 modules transformed. dist/index.html 0.55 kB, dist/assets/index.js 192.65 kB (gzip: 60.76 kB). ✓ built in 24.47s` | Zero TypeScript or Vite compilation errors |

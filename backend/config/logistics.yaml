@@ -1,0 +1,23 @@
+vehicles:
+  - vehicle_type: "MINI_TRUCK"
+    capacity_kg: 750
+    cost_per_km: 12.0
+    fixed_cost_per_trip: 400.0
+    avg_speed_kmph: 30.0
+  - vehicle_type: "PICKUP"
+    capacity_kg: 1500
+    cost_per_km: 16.0
+    fixed_cost_per_trip: 600.0
+    avg_speed_kmph: 30.0
+  - vehicle_type: "MEDIUM_TRUCK"
+    capacity_kg: 4000
+    cost_per_km: 26.0
+    fixed_cost_per_trip: 1200.0
+    avg_speed_kmph: 30.0
+
+avg_speed_kmph: 30.0
+service_minutes_per_stop: 20.0
+road_circuity_factor: 1.35
+return_leg_factor: 2.0
+max_route_minutes: 600
+max_order_chunk_kg: 4000

@@ -1,0 +1,27 @@
+seed: 42
+horizon_days: 730
+elasticity: 0.3
+noise_sigma: 0.12
+shock_prob: 0.01
+dropout_prob: 0.01
+
+base_prices:
+  Tomato: 24.0
+  Onion: 22.0
+  Potato: 18.0
+  Cauliflower: 28.0
+  Green Chilli: 45.0
+
+base_demand:
+  Tomato: 900.0
+  Onion: 1400.0
+  Potato: 1600.0
+  Cauliflower: 350.0
+  Green Chilli: 120.0
+
+hub_scale:
+  Delhi North: 1.6
+  Gurugram: 1.0
+  Noida: 1.0
+  Ghaziabad: 0.9
+  Faridabad: 0.7

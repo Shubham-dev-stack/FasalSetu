@@ -1,0 +1,11 @@
+weights:
+  price: 0.40
+  distance: 0.20
+  freshness: 0.20
+  fill: 0.20
+
+price_headroom_fraction: 0.30
+max_match_distance_km: 300.0
+supply_radius_km: 150.0
+shortage_ratio: 0.7
+surplus_ratio: 1.3

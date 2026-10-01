@@ -1,5 +1,5 @@
 # AGENTS.md — read before any task
-Project: KrishiSetu (SIH26033). One developer: Shubham Kumar. You are an assistant.
+Project: FasalSetu (SIH26033). One developer: Shubham Kumar. You are an assistant.
 Read order: Memory.md → docs/Rules.md → the doc sections named in the task.
 Authoritative docs: docs/Architecture.md, Data.md, ML.md, API.md, Design.md, Testing.md, Phases.md.
 Always: inspect before editing; plan before major changes; smallest diff; no new dependencies; no invented APIs/fields/data/results;
