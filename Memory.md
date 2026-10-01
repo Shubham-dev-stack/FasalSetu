@@ -17,10 +17,10 @@ Update rules: Execution.md §8. Never record results that were not produced by a
 
 | Item | State |
 |---|---|
-| Documentation package (14 files + AGENTS.md text in Execution.md §11) | **Complete** (this session) |
-| Source code | **None written** — repo not yet created |
-| Current implementation phase | **Not started — next: Phase 0** |
-| Tests executed | **None** (Testing.md §15 log empty) |
+| Documentation package (14 files + AGENTS.md) | **Complete** (moved to `docs/` with README, Memory, AGENTS at root) |
+| Source code | **Phase 0 skeleton complete** (backend FastAPI app + frontend Vite React TS) |
+| Current implementation phase | **Phase 0 complete — next: Phase 1** (Foundation + DB + auth + logistics utils) |
+| Tests executed | **AC-SYS-01 passed** (`pytest -q` on health endpoint: 1 passed) |
 | Measured metrics | **None** (no model trained, no solver run) |
 
 ## 3. Completed documentation
@@ -97,10 +97,9 @@ PRD §18. Highlights: real demand data, Agmarknet/eNAM feeds, payments, individu
 
 ## 13. Next action
 
-1. Create the repo, copy the package as laid out in README.md, commit `docs: initial documentation package`.
-2. Run the **first Antigravity task** (Execution.md §10) = Phase 0.
-3. Confirm `ortools` and `lightgbm` install on the dev OS (Python 3.11) before anything else.
-4. Re-verify S-1, S-6, S-12 in Research §12 and the SIH26033 text on the portal before final submission.
+1. Proceed to **Phase 1** (Execution.md & Phases.md §3): Foundation + database (15 tables) + auth + pure logistics utils.
+2. Confirm Python 3.12 wheel installations verified: `ortools 9.15.6755`, `lightgbm 4.7.0`, `fastapi 0.142.2`, `SQLAlchemy 2.1.1`.
+3. Re-verify S-1, S-6, S-12 in Research §12 and the SIH26033 text on the portal before final submission.
 
 ## 14. Decisions that must NOT be repeated / re-opened
 
