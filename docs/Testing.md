@@ -1,0 +1,189 @@
+# Testing — KrishiSetu
+
+Status: PLANNED. **No test has been executed yet.** The execution log in §15 is empty and append-only. A test counts as passed only if it was run in the current session and the output is recorded there (Rules §6).
+
+## 1. Strategy
+
+| Layer | Tool | Scope | Priority |
+|---|---|---|---|
+| Unit | pytest | Pure functions: geo, cost, scoring, allocation, pricing, features, metrics, state machine | MUST |
+| API | pytest + FastAPI `TestClient` + temp SQLite per test session | Every endpoint: success, validation, authz, error envelope | MUST |
+| Database | pytest | Constraints, atomic reservation, seed determinism | MUST |
+| ML | pytest | Leakage, interval ordering, fallback, model-card flags | MUST |
+| Matching | pytest on seed + fixtures | Filters, ranking, allocation | MUST |
+| Routing | pytest | Capacity, precedence, unassigned, fallback | MUST |
+| Integration | pytest (`tests/integration/test_demo_path.py`) | Demo path via API from fresh seed | MUST |
+| UI | Vitest + Testing Library (components), manual checklist (screens) | Forms, states, badges | SHOULD / MUST (manual) |
+| Responsive | Manual at 360 / 768 / 1280 px | Layout, no horizontal scroll | MUST |
+| E2E | Playwright | Demo path | NICE |
+
+Commands (from README): `pytest -q` (backend), `npm run test` and `npm run build` (frontend), `ruff check .`.
+
+Test data: the deterministic seed (Data.md §12) plus tiny hand-written fixtures in `backend/tests/fixtures/` (SYNTHETIC). Fixtures use fixed dates passed into functions (no hidden `today`).
+
+## 2. Acceptance criteria — Auth / system / data / security
+
+| ID | Criterion |
+|---|---|
+| AC-AUTH-01 | Valid login returns token, role, user; token decodes with expected claims and expiry |
+| AC-AUTH-02 | Wrong password and unknown email both return 401 `UNAUTHENTICATED` with identical message |
+| AC-AUTH-03 | Role guard: BUYER calling `POST /listings` → 403; PRODUCER calling `POST /routes/optimize` → 403; no token → 401 |
+| AC-AUTH-04 | With `DEMO_MODE=false`, `POST /auth/demo-login` and `POST /system/reset-demo` → 404 `DEMO_DISABLED` |
+| AC-SYS-01 | `GET /health` returns status and db state without auth |
+| AC-SYS-02 | Every non-2xx response matches the error envelope; validation errors list `details[].field` |
+| AC-SYS-03 | Simulated DB failure returns 503 `DATABASE_UNAVAILABLE`, no stack trace |
+| AC-DATA-01 | After seed, every row in demo tables has `is_demo=true`; synthetic datasets have `is_synthetic=true` / `source` set |
+| AC-DATA-02 | `model_card.json` has `data_source:"SYNTHETIC"` and a disclaimer; `GET /forecasts/*` carry `data_source` |
+| AC-DATA-03 | Running seed twice yields identical entity counts and identical IDs for reference/demo entities |
+| AC-DATA-04 | DB CHECK constraints reject: negative/zero quantity, available>total, min_order>quantity, price≤0, until<from |
+| AC-SEC-01 | Passwords stored hashed (no plaintext in DB or logs) |
+| AC-SEC-02 | Expired or tampered JWT → 401 |
+| AC-SEC-03 | Object-level authz: producer A cannot PATCH producer B's listing; buyer A cannot read buyer B's requirement/order (403) |
+| AC-SEC-04 | SQL-injection-like strings in query params/body do not alter behaviour (parameterised queries) |
+| AC-SEC-05 | No secrets in repo (`git grep` for `SECRET_KEY=` values, keys); `.env` ignored |
+| AC-SEC-06 | CORS: in `prod` mode no wildcard origin; responses contain no stack traces |
+
+## 3. Listings and requirements
+
+| ID | Criterion |
+|---|---|
+| AC-LST-01 | Valid listing creates `ACTIVE` listing with `quantity_available_kg = quantity_kg` |
+| AC-LST-02 | Quantity ≤0, >100000 or non-numeric → 422 with field `quantity_kg` (**invalid quantity**) |
+| AC-LST-03 | Price ≤0 or >100000 → 422 (**invalid price**); ask >3× benchmark → 201 with `PRICE_FAR_ABOVE_BENCHMARK` warning |
+| AC-LST-04 | `min_order>quantity`, `until<from`, `until<today`, harvest in future or >30 days old → 422 |
+| AC-LST-05 | Unknown `crop_id` → 422/404 per API.md |
+| AC-LST-06 | Non-owner PATCH → 403 |
+| AC-LST-07 | Expired/withdrawn/sold-out listings are excluded from default marketplace results (**unavailable produce**) |
+| AC-REQ-01 | Valid requirement → `OPEN` with `quantity_fulfilled_kg=0` |
+| AC-REQ-02 | `needed_by` in the past → 422 |
+| AC-REQ-03 | Invalid quantity or max price → 422 |
+| AC-REQ-04 | Owner can cancel; cannot reduce quantity below fulfilled; non-owner → 403 |
+
+## 4. Marketplace and orders
+
+| ID | Criterion |
+|---|---|
+| AC-MKT-01 | Filters (crop, grade_min, state, max_price, harvest age) return only matching listings; `sort` orders correctly |
+| AC-MKT-02 | `landed_estimate` present for BUYER callers (and when `buyer_lat/lng` given) and equals ask + transport + fee (±0.01) |
+| AC-MKT-03 | No results → `{items:[],total:0}`; UI shows empty state |
+| AC-ORD-01 | Direct order reserves quantity atomically: `available` decreases by ordered qty |
+| AC-ORD-02 | Ordering more than available → 409 `INSUFFICIENT_QUANTITY`; nothing written |
+| AC-ORD-03 | Ordering below `min_order_kg` → 422 |
+| AC-ORD-04 | Two sequential orders that together exceed availability: second fails; available never negative (**no oversell**) |
+| AC-ORD-05 | Allowed transitions succeed per API.md §7 matrix; every other transition → 409 `INVALID_TRANSITION`; each writes an `order_events` row; ADMIN override logged with `actor_role=ADMIN` |
+| AC-ORD-06 | Reject/cancel restores `quantity_available_kg` and recomputes requirement fulfilment/status |
+| AC-ORD-07 | Order on withdrawn/expired/sold-out listing → 409 `LISTING_UNAVAILABLE` |
+
+## 5. Forecasting / ML
+
+| ID | Criterion |
+|---|---|
+| AC-FC-01 | `GET /forecasts/demand` returns `horizon_days` points; for LIGHTGBM `lo ≤ yhat ≤ hi` and all ≥ 0 |
+| AC-FC-02 | With artifacts removed or model load raising, endpoint returns 200 with `method="SEASONAL_NAIVE_FALLBACK"`, `lo/hi=null` (**ML prediction failure**) |
+| AC-FC-03 | Unknown hub/crop → 404 |
+| AC-FC-04 | **Leakage test:** features for date d from series truncated at d−7 equal features from the full series |
+| AC-FC-05 | `model-info` returns metrics, split ranges, `deployed_method`, synthetic disclaimer; metrics file is produced by `ml.train` (not hand-written) |
+| AC-FC-06 | History <14 days → 422 `INSUFFICIENT_HISTORY` (**missing dataset values**); 14–34 days → fallback; gap-filling flags imputed rows and excludes them from metrics |
+| AC-FC-07 | `GET /forecasts/hubs` returns hubs sorted by `opportunity_score`; status = SHORTAGE if ratio<0.7, SURPLUS if >1.3, else BALANCED; each listing counted once (nearest hub) |
+| AC-FC-08 | Metric functions (MAE, RMSE, WAPE, MAPE with y≥10 guard, coverage) verified on hand-computed tiny arrays |
+| AC-FC-09 | Deployment gate logic: LightGBM deployed only when it beats both baselines on validation (×0.95) and test (unit-tested with stub metrics) |
+
+## 6. Matching
+
+| ID | Criterion |
+|---|---|
+| AC-MAT-01 | Candidates sorted by `scores.total` desc with deterministic tie-break |
+| AC-MAT-02 | Each hard filter (grade, budget, distance, freshness/transit, availability, expiry) excludes correctly and appears in `near_misses` with the right `excluded_reason` |
+| AC-MAT-03 | **Partial quantity match:** seed R3 (Cauliflower, grade A, 1,000 kg) yields `PARTIAL` with shortfall; UI shows shortfall banner |
+| AC-MAT-04 | **No buyer match:** seed R8 (budget below every Grade-A ask) yields `NONE`, empty allocations, near-misses explain budget gap |
+| AC-MAT-05 | Multi-source: allocations sum ≤ requested, each ≤ available, each ≥ `min_order_kg`; seed R2 uses >1 listing |
+| AC-MAT-06 | `accept` revalidates server-side and creates orders atomically with `origin=MATCHING`; requirement fulfilment updated |
+| AC-MAT-07 | If a listing's availability changed between view and accept → 409 `STALE_ALLOCATION`, zero orders created |
+| AC-MAT-08 | Every candidate carries four factor scores, weights and ≥1 reason |
+
+## 7. Logistics and routing
+
+| ID | Criterion |
+|---|---|
+| AC-LOG-01 | Haversine for a known city pair within ±1 km of the reference value; road distance = haversine × circuity |
+| AC-LOG-02 | Vehicle selection picks the smallest type with capacity ≥ qty |
+| AC-LOG-03 | **Insufficient vehicle capacity** for one vehicle: qty > largest capacity → multiple trips (n_full largest + remainder fit) |
+| AC-LOG-04 | Cost = Σ(fixed + rate × distance × return_factor); `cost_per_kg = cost/qty`; hand-computed fixture matches ±0.01 |
+| AC-LOG-05 | No available vehicles → 409 `NO_VEHICLE_AVAILABLE` |
+| AC-RTE-01 | For every shipment, load never exceeds vehicle capacity at any stop |
+| AC-RTE-02 | For every order chunk, pickup precedes drop and both are on the same vehicle |
+| AC-RTE-03 | Route duration (incl. service) ≤ `max_route_minutes` |
+| AC-RTE-04 | On the seeded pool (O1–O6) the optimized cost ≤ baseline cost; if not, the response reports negative savings truthfully (test asserts consistency of the numbers, and the observed relationship is recorded in the log) |
+| AC-RTE-05 | Infeasible/oversized load → listed in `unassigned` with a reason; call does not crash (**no route available** case) |
+| AC-RTE-06 | No CONFIRMED unrouted orders → 422 `NO_ELIGIBLE_ORDERS` |
+| AC-RTE-07 | Solver time limit respected (wall time ≤ limit + 3 s); on solver failure `GREEDY_FALLBACK` plan is valid under AC-RTE-01..03 |
+| AC-RTE-08 | OSRM unreachable (mocked) → plan still returned with `distance_source="ESTIMATED_HAVERSINE"` (only if OSRM implemented) |
+| AC-RTE-09 | Approve creates shipments/stops, sets `orders.shipment_id` and `allocated_transport_cost_total` (kg-km split sums to route cost ±0.01); second approve → 409 |
+| AC-RTE-10 | Discard leaves orders unchanged; approve of a plan whose order changed → 409 `STALE_PLAN` |
+
+## 8. Pricing and analytics
+
+| ID | Criterion |
+|---|---|
+| AC-PRC-01 | `landed = farmgate + transport + platform_fee` (±0.01); `platform_fee = farmgate × pct/100` |
+| AC-PRC-02 | Benchmark object always includes `source` and `is_synthetic`; response has `basis:"MODELLED_SCENARIO"` and the full assumptions |
+| AC-PRC-03 | Scenario formulas (ML.md §12) verified against a hand-computed fixture; fair band `null` when U ≤ L |
+| AC-PRC-04 | Missing benchmark → `benchmark:null, scenario:null`, HTTP 200 (**missing dataset values**) |
+| AC-ANL-01 | On the seed, KPIs equal values computed independently by a test using direct SQL/py arithmetic |
+| AC-ANL-02 | After accepting an allocation, confirming it and approving a plan, the relevant KPIs change as expected |
+| AC-ANL-03 | Empty DB → counts 0, ratios/averages `null`, HTTP 200 |
+
+## 9. UI and responsive
+
+| ID | Criterion |
+|---|---|
+| AC-UI-01 | At 360 px no page-level horizontal scroll on any screen; tables scroll within containers |
+| AC-UI-02 | Every data screen implements loading, empty and error states (manual checklist + component tests) |
+| AC-UI-03 | DEMO DATA badge visible on all screens in demo mode; Synthetic/Modelled/Estimated badges present where specified in Design.md |
+| AC-UI-04 | Forms mirror Data.md §8 validation; server `details` shown on the right field |
+| AC-UI-05 | Keyboard: all interactive elements reachable with visible focus; inputs labelled; touch targets ≥44 px (manual) |
+
+## 10. Integration
+
+| ID | Criterion |
+|---|---|
+| AC-INT-01 | From a fresh reset the full Demo.md path runs via API test: create listing → forecast/hubs → candidates → accept → confirm → optimize → approve → breakdown → analytics |
+| AC-INT-02 | Same path in the browser twice in a row without manual DB edits |
+| AC-INT-03 | `reset-demo` restores the initial state (counts, availability) |
+
+## 11. Edge cases and failure handling matrix
+
+| Case | Expected | Covered by |
+|---|---|---|
+| Invalid quantity | 422, field error | AC-LST-02, AC-REQ-03 |
+| Invalid price | 422 | AC-LST-03 |
+| Unavailable produce | 409 `LISTING_UNAVAILABLE` / excluded from market | AC-ORD-07, AC-LST-07 |
+| No buyer match | `NONE` + near-misses | AC-MAT-04 |
+| Partial quantity match | `PARTIAL` + shortfall | AC-MAT-03 |
+| Insufficient vehicle capacity | multi-trip / unassigned | AC-LOG-03, AC-RTE-05 |
+| No route available | unassigned with reason / `NO_ELIGIBLE_ORDERS` | AC-RTE-05, 06 |
+| Missing dataset values | fallback / 422 / null benchmark | AC-FC-06, AC-PRC-04 |
+| ML prediction failure | fallback method | AC-FC-02 |
+| API failure (frontend) | ErrorState with retry | AC-UI-02 |
+| Database failure | 503 envelope | AC-SYS-03 |
+| Concurrent orders | no oversell | AC-ORD-04 |
+| OSRM/tiles failure | haversine / schematic list | AC-RTE-08, Design §12 |
+| Stale accept / stale plan | 409 | AC-MAT-07, AC-RTE-10 |
+
+## 12. Security checks (manual + automated)
+
+Run AC-SEC-01…06; additionally review that demo credentials appear only in seed code and README demo section, that logs contain no tokens/passwords, and that `DEMO_MODE=false` hides the persona buttons in the UI build.
+
+## 13. Non-functional spot checks (Phase 12)
+
+Measure and record (do not assume): p95 latency on 50 requests for list/detail endpoints; optimizer wall time on the seed pool and on a 30-order synthetic stress case; forecast inference time. Compare to NFR targets in PRD §15 and record actuals, including misses.
+
+## 14. Release gate (before `demo-ready` tag)
+
+All MUST ACs executed; any failure either fixed or recorded in Memory.md "Known bugs" and excluded from the demo path; `npm run build` and `pytest -q` executed after the final commit; Demo.md path run twice; screenshots/video captured.
+
+## 15. Execution log (append-only; currently empty — nothing has been run)
+
+| Date | Command / check | Result (paste real output summary) | Notes |
+|---|---|---|---|
+| — | — | — | — |
