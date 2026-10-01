@@ -10,6 +10,7 @@ from app.db.models import (
     DemandHub,
     Listing,
     ProducerProfile,
+    Requirement,
     User,
     Vehicle,
 )
@@ -525,4 +526,64 @@ def seed_demo_listings(db: Session) -> dict[str, int]:
 
     db.commit()
     return {"listings": count}
+
+
+def seed_demo_requirements(db: Session) -> dict[str, int]:
+    """Deterministically seed open requirements R1-R8 per Data.md §12."""
+    today = today_ist()
+
+    # Per Data.md §12:
+    # R1: B1, Tomato(1), Grade B, 1500 kg, Max landed 29.00, needed_by = today + 1
+    # R2: B5, Onion(2), Grade B, 6500 kg, Max landed 28.00, needed_by = today + 3
+    # R3: B2, Cauliflower(4), Grade A, 1000 kg, Max landed 36.00, needed_by = today + 2
+    # R4: B3, Potato(3), Grade B, 3000 kg, Max landed 24.00, needed_by = today + 2
+    # R5: B4, Tomato(1), Grade C, 1000 kg, Max landed 27.00, needed_by = today + 2
+    # R6: B1, Green Chilli(5), Grade B, 300 kg, Max landed 55.00, needed_by = today + 2
+    # R7: B3, Cauliflower(4), Grade B, 400 kg, Max landed 36.00, needed_by = today + 1
+    # R8: B5, Tomato(1), Grade A, 2500 kg, Max landed 22.00, needed_by = today + 2
+    requirements_data = [
+        {"id": 1, "buyer_id": 1, "crop_id": 1, "grade_min": "B", "quantity_kg": 1500.0, "max_landed_price_per_kg": 29.00, "days_ahead": 1, "notes": "Live demo: match before/after new listing"},
+        {"id": 2, "buyer_id": 5, "crop_id": 2, "grade_min": "B", "quantity_kg": 6500.0, "max_landed_price_per_kg": 28.00, "days_ahead": 3, "notes": "Multi-source allocation"},
+        {"id": 3, "buyer_id": 2, "crop_id": 4, "grade_min": "A", "quantity_kg": 1000.0, "max_landed_price_per_kg": 36.00, "days_ahead": 2, "notes": "Partial fill"},
+        {"id": 4, "buyer_id": 3, "crop_id": 3, "grade_min": "B", "quantity_kg": 3000.0, "max_landed_price_per_kg": 24.00, "days_ahead": 2, "notes": "Normal match"},
+        {"id": 5, "buyer_id": 4, "crop_id": 1, "grade_min": "C", "quantity_kg": 1000.0, "max_landed_price_per_kg": 27.00, "days_ahead": 2, "notes": "Low-grade tolerant processor"},
+        {"id": 6, "buyer_id": 1, "crop_id": 5, "grade_min": "B", "quantity_kg": 300.0, "max_landed_price_per_kg": 55.00, "days_ahead": 2, "notes": "Small lots"},
+        {"id": 7, "buyer_id": 3, "crop_id": 4, "grade_min": "B", "quantity_kg": 400.0, "max_landed_price_per_kg": 36.00, "days_ahead": 1, "notes": "Freshness sensitivity"},
+        {"id": 8, "buyer_id": 5, "crop_id": 1, "grade_min": "A", "quantity_kg": 2500.0, "max_landed_price_per_kg": 22.00, "days_ahead": 2, "notes": "No match budget below Grade-A ask"},
+    ]
+
+    count = 0
+    for item in requirements_data:
+        needed_by = today + timedelta(days=item["days_ahead"])
+        existing = db.query(Requirement).filter(Requirement.id == item["id"]).first()
+        if existing:
+            existing.buyer_id = item["buyer_id"]
+            existing.crop_id = item["crop_id"]
+            existing.grade_min = item["grade_min"]
+            existing.quantity_kg = item["quantity_kg"]
+            existing.quantity_fulfilled_kg = 0.0
+            existing.max_landed_price_per_kg = item["max_landed_price_per_kg"]
+            existing.needed_by = needed_by
+            existing.status = "OPEN"
+            existing.notes = item["notes"]
+            existing.is_demo = True
+        else:
+            req = Requirement(
+                id=item["id"],
+                buyer_id=item["buyer_id"],
+                crop_id=item["crop_id"],
+                grade_min=item["grade_min"],
+                quantity_kg=item["quantity_kg"],
+                quantity_fulfilled_kg=0.0,
+                max_landed_price_per_kg=item["max_landed_price_per_kg"],
+                needed_by=needed_by,
+                status="OPEN",
+                notes=item["notes"],
+                is_demo=True,
+            )
+            db.add(req)
+        count += 1
+
+    db.commit()
+    return {"requirements": count}
 

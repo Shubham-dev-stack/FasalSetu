@@ -1,4 +1,9 @@
-import { ProducerProfileOut, ProducerProfileUpdate } from './types';
+import {
+  BuyerProfileOut,
+  BuyerProfileUpdate,
+  ProducerProfileOut,
+  ProducerProfileUpdate,
+} from './types';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
@@ -42,4 +47,28 @@ export async function updateProducerProfileApi(
     body: JSON.stringify(payload),
   });
   return handleResponse<ProducerProfileOut>(response);
+}
+
+export async function fetchBuyerProfileApi(token: string): Promise<BuyerProfileOut> {
+  const response = await fetch(`${API_BASE}/buyers/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return handleResponse<BuyerProfileOut>(response);
+}
+
+export async function updateBuyerProfileApi(
+  token: string,
+  payload: BuyerProfileUpdate
+): Promise<BuyerProfileOut> {
+  const response = await fetch(`${API_BASE}/buyers/me`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<BuyerProfileOut>(response);
 }

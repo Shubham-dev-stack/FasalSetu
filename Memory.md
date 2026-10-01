@@ -18,10 +18,10 @@ Update rules: Execution.md §8. Never record results that were not produced by a
 | Item | State |
 |---|---|
 | Documentation package (14 files + AGENTS.md) | **Complete** (moved to `docs/` with README, Memory, AGENTS at root) |
-| Source code | **Phase 3 complete** (Producer / Farmer / FPO Module + Listing Lifecycle + Price Benchmark Sanity Check + Producer Dashboard UI) |
-| Current implementation phase | **Phase 3 complete — next: Phase 4** (Buyer Module) |
-| Tests executed | **48 backend tests passed** (`pytest -v`), **8 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
-| Measured metrics | **Data & Model verified**: 14 listings seeded (`L1`–`L14`); price sanity check warning (`PRICE_FAR_ABOVE_BENCHMARK`) verified; object-level authorization verified (403 on non-owner patch); dynamic expiry evaluation verified |
+| Source code | **Phase 4 complete** (Buyer Module + Buyer Profile + Requirement Lifecycle + Landed Price Guidance + Seed R1-R8 + Buyer UI) |
+| Current implementation phase | **Phase 4 complete — next: Phase 5** (Unified Marketplace + Discovery) |
+| Tests executed | **63 backend tests passed** (`pytest -v`), **17 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
+| Measured metrics | **Data & Model verified**: 8 requirements seeded (`R1`–`R8`); buyer profile retrieval and bounded update verified; object-level authorization verified (403 on cross-buyer & producer access); Rule D-021 dynamic expiry on GET/PATCH verified (409 on expired mutation); educational landed-cost guidance verified |
 
 
 

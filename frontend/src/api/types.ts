@@ -251,3 +251,94 @@ export interface ListingListResponse {
   total: number;
 }
 
+export interface HubSummary {
+  id: number;
+  name: string;
+  state: string;
+  lat: number;
+  lng: number;
+}
+
+export interface BuyerProfileOut {
+  id: number;
+  user_id: number;
+  buyer_type: string;
+  org_name: string;
+  hub_id: number;
+  hub?: HubSummary | null;
+  city: string;
+  state: string;
+  lat: number;
+  lng: number;
+  is_demo: boolean;
+  created_at: string;
+}
+
+export interface BuyerProfileUpdate {
+  org_name?: string;
+  city?: string;
+  state?: string;
+  hub_id?: number;
+  lat?: number;
+  lng?: number;
+}
+
+export interface BuyerSummary {
+  id: number;
+  org_name: string;
+  buyer_type: string;
+  city: string;
+  state: string;
+  hub_id: number;
+  lat: number;
+  lng: number;
+}
+
+export interface LandedPriceGuidance {
+  formula: string;
+  note: string;
+}
+
+export interface Requirement {
+  id: number;
+  buyer: BuyerSummary;
+  crop: CropSummary;
+  grade_min: 'A' | 'B' | 'C';
+  quantity_kg: number;
+  quantity_fulfilled_kg: number;
+  max_landed_price_per_kg: number;
+  needed_by: string;
+  status: 'OPEN' | 'PARTIALLY_FULFILLED' | 'FULFILLED' | 'CANCELLED' | 'EXPIRED';
+  notes?: string | null;
+  is_demo: boolean;
+  created_at: string;
+  landed_guidance?: LandedPriceGuidance | null;
+}
+
+export interface RequirementCreateRequest {
+  crop_id: number;
+  grade_min: 'A' | 'B' | 'C';
+  quantity_kg: number;
+  max_landed_price_per_kg: number;
+  needed_by: string;
+  notes?: string | null;
+}
+
+export interface RequirementUpdateRequest {
+  quantity_kg?: number;
+  max_landed_price_per_kg?: number;
+  needed_by?: string;
+  notes?: string | null;
+  status?: 'CANCELLED';
+}
+
+export interface RequirementDetailResponse {
+  requirement: Requirement;
+  landed_guidance?: LandedPriceGuidance | null;
+}
+
+export interface RequirementListResponse {
+  items: Requirement[];
+  total: number;
+}
+

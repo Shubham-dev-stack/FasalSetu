@@ -199,5 +199,9 @@ All MUST ACs executed; any failure either fixed or recorded in Memory.md "Known 
 | 2026-10-01 | `ruff check .` (backend linter - Phase 3) | `All checks passed!` | Zero lint or formatting errors across all backend code and test files |
 | 2026-10-01 | `npm test` (frontend vitest - Phase 3) | `Test Files: 2 passed (2), Tests: 8 passed (8), Duration: 2.15s` | AC-LST-01..04 client-side validation rules and auth tests passed |
 | 2026-10-01 | `npm run build` (frontend bundle - Phase 3) | `✓ 1503 modules transformed. dist/index.html 0.55 kB, dist/assets/index.js 230.19 kB (gzip: 68.04 kB). ✓ built in 6.24s` | Zero TypeScript or Vite compilation errors across new producer pages and components |
+| 2026-10-01 | `pytest -v` (backend suite - Phase 4) | `63 passed, 30 warnings in 20.74s` | AC-REQ-01..04 passed; Buyer profile (GET/PATCH), requirement creation, listing, detail, lifecycle update, cancellation, Rule D-021 dynamic expiry on GET/PATCH, cross-buyer 403, producer 403 authorization guards, and seeded open requirements R1-R8 verified |
+| 2026-10-01 | `ruff check .` (backend linter - Phase 4) | `All checks passed!` | Zero lint or formatting errors across all backend code and test files |
+| 2026-10-01 | `npm test` (frontend vitest - Phase 4) | `Test Files: 3 passed (3), Tests: 17 passed (17), Duration: 2.10s` | Buyer requirement validation rules, dynamic expiry, terminal state immutability, educational landed price formula, and coordinate bounds verified |
+| 2026-10-01 | `npm run build` (frontend bundle - Phase 4) | `✓ 1510 modules transformed. dist/assets/index-mYlNfQpy.js 262.27 kB (gzip: 73.31 kB). ✓ built in 5.43s` | Zero TypeScript or Vite compilation errors across new buyer pages, components, and router integration |
 
 

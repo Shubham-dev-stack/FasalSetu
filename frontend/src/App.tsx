@@ -8,6 +8,9 @@ import { PlaceholderPage } from './pages/placeholder/PlaceholderPage';
 import { ListingsPage } from './pages/producer/ListingsPage';
 import { NewListingPage } from './pages/producer/NewListingPage';
 import { ProducerProfilePage } from './pages/producer/ProducerProfilePage';
+import { RequirementsPage } from './pages/buyer/RequirementsPage';
+import { NewRequirementPage } from './pages/buyer/NewRequirementPage';
+import { BuyerProfilePage } from './pages/buyer/BuyerProfilePage';
 
 const ProtectedLayout: React.FC<{ children: React.ReactNode; title?: string }> = ({
   children,
@@ -110,12 +113,26 @@ export default function App() {
           <Route
             path="/buyer/requirements"
             element={
-              <ProtectedLayout title="Buyer Requirements">
-                <PlaceholderPage
-                  title="Buyer Requirements"
-                  phase="Phase 5 — Buyer Matching Engine"
-                  description="Define demand specifications and review greedy bilateral matches against active producer lots."
-                />
+              <ProtectedLayout title="My Procurement Requirements">
+                <RequirementsPage />
+              </ProtectedLayout>
+            }
+          />
+
+          <Route
+            path="/buyer/requirements/new"
+            element={
+              <ProtectedLayout title="Post Procurement Requirement">
+                <NewRequirementPage />
+              </ProtectedLayout>
+            }
+          />
+
+          <Route
+            path="/buyer/profile"
+            element={
+              <ProtectedLayout title="Buyer Organization Profile">
+                <BuyerProfilePage />
               </ProtectedLayout>
             }
           />

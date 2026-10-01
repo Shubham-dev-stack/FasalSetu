@@ -42,11 +42,12 @@ export const AppShell: React.FC<{ children: React.ReactNode; title?: string }> =
     }
 
 
-    if (user.role.startsWith('buyer_')) {
+    if (roleUpper === 'BUYER' || user.role.startsWith('buyer_')) {
       return [
-        { label: 'Requirements', to: '/buyer/requirements', icon: Layers },
-        { label: 'Market', to: '/market', icon: ShoppingBag },
-        { label: 'Demand', to: '/forecast', icon: TrendingUp },
+        { label: 'My Demands', to: '/buyer/requirements', icon: Layers },
+        { label: 'Post Demand', to: '/buyer/requirements/new', icon: ShoppingBag },
+        { label: 'Buyer Profile', to: '/buyer/profile', icon: UserCircle },
+        { label: 'Market', to: '/market', icon: Package },
         { label: 'Orders', to: '/orders', icon: ClipboardList },
         { label: 'Analytics', to: '/analytics', icon: BarChart3 },
       ];
