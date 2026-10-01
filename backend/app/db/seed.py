@@ -1,10 +1,14 @@
+from datetime import timedelta
+
 from sqlalchemy.orm import Session
 
+from app.core.dates import today_ist
 from app.core.security import hash_password
 from app.db.models import (
     BuyerProfile,
     Crop,
     DemandHub,
+    Listing,
     ProducerProfile,
     User,
     Vehicle,
@@ -453,3 +457,72 @@ def seed_synthetic_demand_and_prices(db: Session, seed: int = 42) -> dict[str, i
     save_datasets(post_drop_df, complete_df, prices_df)
     counts = seed_demand_and_prices(db, post_drop_df, prices_df)
     return counts
+
+
+def seed_demo_listings(db: Session) -> dict[str, int]:
+    """Deterministically seed listings L1-L14 per Data.md §12."""
+    today = today_ist()
+
+    # Per Data.md §12:
+    # Tomato(1), Cauliflower(4), Green Chilli(5): harvest=today-1, available=today -> today+3
+    # Onion(2), Potato(3): harvest=today-3, available=today -> today+10
+    listings_data = [
+        {"id": 1, "producer_id": 2, "crop_id": 1, "grade": "B", "quantity_kg": 800.0, "ask_price_per_kg": 22.50, "min_order_kg": 100.0, "is_high_perish": True},
+        {"id": 2, "producer_id": 6, "crop_id": 1, "grade": "A", "quantity_kg": 1200.0, "ask_price_per_kg": 24.00, "min_order_kg": 200.0, "is_high_perish": True},
+        {"id": 3, "producer_id": 3, "crop_id": 1, "grade": "C", "quantity_kg": 600.0, "ask_price_per_kg": 19.50, "min_order_kg": 100.0, "is_high_perish": True},
+        {"id": 4, "producer_id": 5, "crop_id": 1, "grade": "B", "quantity_kg": 500.0, "ask_price_per_kg": 23.00, "min_order_kg": 100.0, "is_high_perish": True},
+        {"id": 5, "producer_id": 4, "crop_id": 2, "grade": "A", "quantity_kg": 6000.0, "ask_price_per_kg": 22.50, "min_order_kg": 500.0, "is_high_perish": False},
+        {"id": 6, "producer_id": 2, "crop_id": 2, "grade": "B", "quantity_kg": 3000.0, "ask_price_per_kg": 21.50, "min_order_kg": 500.0, "is_high_perish": False},
+        {"id": 7, "producer_id": 3, "crop_id": 2, "grade": "B", "quantity_kg": 2000.0, "ask_price_per_kg": 21.00, "min_order_kg": 300.0, "is_high_perish": False},
+        {"id": 8, "producer_id": 4, "crop_id": 3, "grade": "A", "quantity_kg": 4000.0, "ask_price_per_kg": 18.00, "min_order_kg": 500.0, "is_high_perish": False},
+        {"id": 9, "producer_id": 2, "crop_id": 3, "grade": "B", "quantity_kg": 2500.0, "ask_price_per_kg": 17.00, "min_order_kg": 300.0, "is_high_perish": False},
+        {"id": 10, "producer_id": 1, "crop_id": 4, "grade": "A", "quantity_kg": 700.0, "ask_price_per_kg": 28.50, "min_order_kg": 100.0, "is_high_perish": True},
+        {"id": 11, "producer_id": 6, "crop_id": 4, "grade": "B", "quantity_kg": 500.0, "ask_price_per_kg": 27.00, "min_order_kg": 100.0, "is_high_perish": True},
+        {"id": 12, "producer_id": 5, "crop_id": 5, "grade": "A", "quantity_kg": 300.0, "ask_price_per_kg": 46.00, "min_order_kg": 50.0, "is_high_perish": True},
+        {"id": 13, "producer_id": 1, "crop_id": 5, "grade": "B", "quantity_kg": 250.0, "ask_price_per_kg": 43.50, "min_order_kg": 50.0, "is_high_perish": True},
+        {"id": 14, "producer_id": 6, "crop_id": 5, "grade": "A", "quantity_kg": 200.0, "ask_price_per_kg": 47.00, "min_order_kg": 50.0, "is_high_perish": True},
+    ]
+
+    count = 0
+    for item in listings_data:
+        is_high = item.pop("is_high_perish")
+        harvest_date = today - timedelta(days=1 if is_high else 3)
+        available_from = today
+        available_until = today + timedelta(days=3 if is_high else 10)
+
+        existing = db.query(Listing).filter(Listing.id == item["id"]).first()
+        if existing:
+            existing.producer_id = item["producer_id"]
+            existing.crop_id = item["crop_id"]
+            existing.grade = item["grade"]
+            existing.quantity_kg = item["quantity_kg"]
+            existing.quantity_available_kg = item["quantity_kg"]
+            existing.ask_price_per_kg = item["ask_price_per_kg"]
+            existing.min_order_kg = item["min_order_kg"]
+            existing.harvest_date = harvest_date
+            existing.available_from = available_from
+            existing.available_until = available_until
+            existing.status = "ACTIVE"
+            existing.is_demo = True
+        else:
+            listing = Listing(
+                id=item["id"],
+                producer_id=item["producer_id"],
+                crop_id=item["crop_id"],
+                grade=item["grade"],
+                quantity_kg=item["quantity_kg"],
+                quantity_available_kg=item["quantity_kg"],
+                ask_price_per_kg=item["ask_price_per_kg"],
+                min_order_kg=item["min_order_kg"],
+                harvest_date=harvest_date,
+                available_from=available_from,
+                available_until=available_until,
+                status="ACTIVE",
+                is_demo=True,
+            )
+            db.add(listing)
+        count += 1
+
+    db.commit()
+    return {"listings": count}
+

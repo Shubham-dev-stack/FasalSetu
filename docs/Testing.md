@@ -195,4 +195,9 @@ All MUST ACs executed; any failure either fixed or recorded in Memory.md "Known 
 | 2026-10-01 | `ruff check .` (backend linter - Phase 2) | `All checks passed!` | Zero lint or formatting errors across new Phase 2 code and tests |
 | 2026-10-01 | `npm test` (frontend vitest - Phase 2 regression) | `Test Files: 1 passed (1), Tests: 2 passed (2), Duration: 2.19s` | Frontend tests verified unaffected by data layer additions |
 | 2026-10-01 | `npm run build` (frontend bundle - Phase 2 regression) | `✓ 1494 modules transformed. dist/assets/index-CJ5Zz8SD.js 192.65 kB (gzip: 60.76 kB). ✓ built in 25.41s` | Frontend production bundle verified cleanly compiling |
+| 2026-10-01 | `pytest -v` (backend suite - Phase 3) | `48 passed, 23 warnings in 21.83s` | AC-LST-01..07, AC-SEC-03, AC-AUTH-01..06, AC-SYS-01..03, AC-GEO-01..02, AC-LOG-01..04, AC-GEN-01..05, AC-AGM-01..02 passed; Producer profile, produce listing lifecycle, benchmark price sanity check & warning, dynamic expiry, and L1-L14 seeded lots verified |
+| 2026-10-01 | `ruff check .` (backend linter - Phase 3) | `All checks passed!` | Zero lint or formatting errors across all backend code and test files |
+| 2026-10-01 | `npm test` (frontend vitest - Phase 3) | `Test Files: 2 passed (2), Tests: 8 passed (8), Duration: 2.15s` | AC-LST-01..04 client-side validation rules and auth tests passed |
+| 2026-10-01 | `npm run build` (frontend bundle - Phase 3) | `✓ 1503 modules transformed. dist/index.html 0.55 kB, dist/assets/index.js 230.19 kB (gzip: 68.04 kB). ✓ built in 6.24s` | Zero TypeScript or Vite compilation errors across new producer pages and components |
+
 

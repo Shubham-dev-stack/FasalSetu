@@ -6,6 +6,8 @@ from app.core.config import get_settings
 from app.core.database import SessionLocal
 from app.core.errors import register_error_handlers
 from app.modules.auth.router import router as auth_router
+from app.modules.listings.router import router as listings_router
+from app.modules.profiles.router import router as profiles_router
 from app.modules.reference.router import router as reference_router
 
 
@@ -57,8 +59,11 @@ def create_app() -> FastAPI:
     # Register API routers
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(reference_router, prefix="/api/v1")
+    app.include_router(profiles_router, prefix="/api/v1")
+    app.include_router(listings_router, prefix="/api/v1")
 
     return app
+
 
 
 app = create_app()

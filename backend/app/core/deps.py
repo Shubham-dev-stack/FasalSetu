@@ -64,3 +64,22 @@ def require_role(allowed_roles: list[str]) -> Callable:
         return current_user
 
     return role_checker
+
+
+def get_optional_current_user(
+    db: Session = Depends(get_db),
+    authorization: str | None = Header(None),
+) -> User | None:
+    if not authorization:
+        return None
+    try:
+        parts = authorization.split()
+        if len(parts) == 2 and parts[0].lower() == "bearer":
+            payload = decode_access_token(parts[1])
+            user_id = payload.get("sub")
+            if user_id is not None:
+                return db.query(User).filter(User.id == int(user_id)).first()
+    except Exception:
+        return None
+    return None
+

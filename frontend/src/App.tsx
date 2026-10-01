@@ -5,6 +5,9 @@ import { LoginPage } from './pages/login/LoginPage';
 import { AppShell } from './components/layout/AppShell';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
 import { PlaceholderPage } from './pages/placeholder/PlaceholderPage';
+import { ListingsPage } from './pages/producer/ListingsPage';
+import { NewListingPage } from './pages/producer/NewListingPage';
+import { ProducerProfilePage } from './pages/producer/ProducerProfilePage';
 
 const ProtectedLayout: React.FC<{ children: React.ReactNode; title?: string }> = ({
   children,
@@ -79,15 +82,30 @@ export default function App() {
           <Route
             path="/producer/listings"
             element={
-              <ProtectedLayout title="My Listings">
-                <PlaceholderPage
-                  title="My Listings"
-                  phase="Phase 4 — Producer Listing Flow"
-                  description="Publish crop lots with quantity, ask prices, and demand intelligence assistance."
-                />
+              <ProtectedLayout title="My Produce Listings">
+                <ListingsPage />
               </ProtectedLayout>
             }
           />
+
+          <Route
+            path="/producer/listings/new"
+            element={
+              <ProtectedLayout title="Publish Produce Lot">
+                <NewListingPage />
+              </ProtectedLayout>
+            }
+          />
+
+          <Route
+            path="/producer/profile"
+            element={
+              <ProtectedLayout title="Producer Profile">
+                <ProducerProfilePage />
+              </ProtectedLayout>
+            }
+          />
+
 
           <Route
             path="/buyer/requirements"

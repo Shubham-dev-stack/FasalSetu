@@ -10,6 +10,7 @@ import {
   BarChart3,
   Truck,
   Layers,
+  UserCircle,
 } from 'lucide-react';
 
 interface NavItem {
@@ -27,15 +28,19 @@ export const AppShell: React.FC<{ children: React.ReactNode; title?: string }> =
   const getNavItems = (): NavItem[] => {
     if (!user) return [];
 
-    if (user.role === 'farmer' || user.role === 'fpo') {
+    const roleUpper = user.role.toUpperCase();
+
+    if (roleUpper === 'PRODUCER' || user.role === 'farmer' || user.role === 'fpo') {
       return [
         { label: 'My Listings', to: '/producer/listings', icon: Package },
+        { label: 'Profile', to: '/producer/profile', icon: UserCircle },
         { label: 'Demand', to: '/forecast', icon: TrendingUp },
         { label: 'Market', to: '/market', icon: ShoppingBag },
         { label: 'Orders', to: '/orders', icon: ClipboardList },
         { label: 'Analytics', to: '/analytics', icon: BarChart3 },
       ];
     }
+
 
     if (user.role.startsWith('buyer_')) {
       return [

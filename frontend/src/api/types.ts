@@ -145,3 +145,109 @@ export const DEMO_PERSONAS: DemoPersona[] = [
     location: 'Central Control Hub',
   },
 ];
+
+export interface ProducerProfileOut {
+  id: number;
+  user_id: number;
+  producer_type: 'FARMER' | 'FPO';
+  org_name: string;
+  state: string;
+  district: string;
+  locality?: string | null;
+  lat: number;
+  lng: number;
+  member_farmers?: number | null;
+  is_demo: boolean;
+  created_at: string;
+}
+
+export interface ProducerProfileUpdate {
+  org_name?: string;
+  state?: string;
+  district?: string;
+  locality?: string | null;
+  lat?: number;
+  lng?: number;
+  member_farmers?: number | null;
+}
+
+export interface ProducerSummary {
+  id: number;
+  org_name: string;
+  producer_type: string;
+  district: string;
+  state: string;
+  lat: number;
+  lng: number;
+}
+
+export interface CropSummary {
+  id: number;
+  name: string;
+  category: string;
+  shelf_life_days: number;
+  perishability: string;
+}
+
+export interface BenchmarkContext {
+  nearest_hub_name?: string | null;
+  benchmark_modal_per_kg?: number | null;
+  benchmark_source?: string | null;
+}
+
+export interface Listing {
+  id: number;
+  producer: ProducerSummary;
+  crop: CropSummary;
+  variety?: string | null;
+  grade: 'A' | 'B' | 'C';
+  quantity_kg: number;
+  quantity_available_kg: number;
+  ask_price_per_kg: number;
+  min_order_kg: number;
+  harvest_date: string;
+  available_from: string;
+  available_until: string;
+  status: 'ACTIVE' | 'SOLD_OUT' | 'EXPIRED' | 'WITHDRAWN';
+  is_demo: boolean;
+  harvest_age_days: number;
+  demand_status?: string | null;
+  created_at: string;
+}
+
+export interface ListingCreateRequest {
+  crop_id: number;
+  variety?: string | null;
+  grade: 'A' | 'B' | 'C';
+  quantity_kg: number;
+  ask_price_per_kg: number;
+  min_order_kg: number;
+  harvest_date: string;
+  available_from: string;
+  available_until: string;
+}
+
+export interface ListingUpdateRequest {
+  ask_price_per_kg?: number;
+  quantity_kg?: number;
+  min_order_kg?: number;
+  available_until?: string;
+  status?: 'WITHDRAWN';
+}
+
+export interface ListingCreateResponse {
+  listing: Listing;
+  warnings: string[];
+  benchmark_context?: BenchmarkContext | null;
+}
+
+export interface ListingDetailResponse {
+  listing: Listing;
+  benchmark_context?: BenchmarkContext | null;
+}
+
+export interface ListingListResponse {
+  items: Listing[];
+  total: number;
+}
+
