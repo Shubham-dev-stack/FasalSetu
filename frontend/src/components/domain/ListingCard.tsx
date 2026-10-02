@@ -1,17 +1,19 @@
 import React from 'react';
 import { Listing } from '../../api/types';
 import { ListingStatusChip } from './ListingStatusChip';
-import { Calendar, Clock, Edit2 } from 'lucide-react';
+import { Calendar, Clock, Edit2, Sparkles } from 'lucide-react';
 
 interface ListingCardProps {
   listing: Listing;
   onEdit?: (listing: Listing) => void;
+  onViewOpportunities?: (listing: Listing) => void;
   showActions?: boolean;
 }
 
 export const ListingCard: React.FC<ListingCardProps> = ({
   listing,
   onEdit,
+  onViewOpportunities,
   showActions = true,
 }) => {
   const percentAvailable =
@@ -103,16 +105,29 @@ export const ListingCard: React.FC<ListingCardProps> = ({
       </div>
 
       {/* Action Buttons */}
-      {showActions && listing.status === 'ACTIVE' && onEdit && (
-        <div className="pt-2">
-          <button
-            type="button"
-            onClick={() => onEdit(listing)}
-            className="w-full inline-flex items-center justify-center space-x-1.5 py-1.5 px-3 rounded-lg border border-gray-300 text-xs font-semibold text-ink hover:bg-gray-50 transition-colors"
-          >
-            <Edit2 className="w-3.5 h-3.5 text-muted" />
-            <span>Edit / Withdraw</span>
-          </button>
+      {showActions && listing.status === 'ACTIVE' && (
+        <div className="pt-2 flex items-center space-x-2">
+          {onViewOpportunities && (
+            <button
+              type="button"
+              onClick={() => onViewOpportunities(listing)}
+              className="flex-1 inline-flex items-center justify-center space-x-1.5 py-1.5 px-3 rounded-lg bg-primary-soft text-primary hover:bg-primary hover:text-white text-xs font-semibold transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Buyer Matches</span>
+            </button>
+          )}
+
+          {onEdit && (
+            <button
+              type="button"
+              onClick={() => onEdit(listing)}
+              className="inline-flex items-center justify-center space-x-1.5 py-1.5 px-3 rounded-lg border border-gray-300 text-xs font-semibold text-ink hover:bg-gray-50 transition-colors"
+            >
+              <Edit2 className="w-3.5 h-3.5 text-muted" />
+              <span>Edit</span>
+            </button>
+          )}
         </div>
       )}
     </div>

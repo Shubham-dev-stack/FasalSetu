@@ -5,6 +5,7 @@ import { fetchListingsApi, updateListingApi } from '../../api/listings';
 import { Listing, ListingUpdateRequest } from '../../api/types';
 import { ListingCard } from '../../components/domain/ListingCard';
 import { EditListingModal } from '../../components/domain/EditListingModal';
+import { ProducerOpportunitiesModal } from '../../components/domain/ProducerOpportunitiesModal';
 import { Plus, Package, RefreshCw, AlertCircle } from 'lucide-react';
 
 const STATUS_TABS = [
@@ -23,6 +24,7 @@ export const ListingsPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [editingListing, setEditingListing] = useState<Listing | null>(null);
+  const [viewingOpportunitiesListingId, setViewingOpportunitiesListingId] = useState<number | null>(null);
 
   const loadListings = useCallback(async () => {
     if (!token) return;
@@ -162,6 +164,7 @@ export const ListingsPage: React.FC = () => {
               key={item.id}
               listing={item}
               onEdit={(lot) => setEditingListing(lot)}
+              onViewOpportunities={(lot) => setViewingOpportunitiesListingId(lot.id)}
             />
           ))}
         </div>
@@ -176,6 +179,13 @@ export const ListingsPage: React.FC = () => {
           onSave={handleUpdateListing}
         />
       )}
+
+      {/* Matching Buyer Demands / Opportunities Modal */}
+      <ProducerOpportunitiesModal
+        listingId={viewingOpportunitiesListingId}
+        isOpen={!!viewingOpportunitiesListingId}
+        onClose={() => setViewingOpportunitiesListingId(null)}
+      />
     </div>
   );
 };

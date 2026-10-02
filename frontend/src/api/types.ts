@@ -508,4 +508,144 @@ export interface ModelInfoResponse {
   disclaimer: string;
 }
 
+export interface MatchingScores {
+  price: number;
+  distance: number;
+  freshness: number;
+  fill: number;
+  total: number;
+}
+
+export interface MatchingWeights {
+  price: number;
+  distance: number;
+  freshness: number;
+  fill: number;
+}
+
+export interface CandidateProducerSummary {
+  id: number;
+  org_name: string;
+  producer_type?: string | null;
+  district?: string | null;
+  state?: string | null;
+}
+
+export interface CandidateListingSummary {
+  id: number;
+  producer: CandidateProducerSummary;
+  grade: string;
+  ask_price_per_kg: number;
+  harvest_date: string;
+  available_from: string;
+  available_until: string;
+  min_order_kg: number;
+}
+
+export interface Candidate {
+  rank: number;
+  listing: CandidateListingSummary;
+  available_kg: number;
+  allocated_kg: number;
+  distance_km: number;
+  distance_source: string;
+  transit_hours: number;
+  age_at_delivery_days: number;
+  ask_price_per_kg: number;
+  transport_cost_per_kg: number;
+  platform_fee_per_kg: number;
+  landed_price_per_kg: number;
+  scores: MatchingScores;
+  weights: MatchingWeights;
+  reasons: string[];
+}
+
+export interface AllocationItem {
+  listing_id: number;
+  quantity_kg: number;
+}
+
+export interface NearMiss {
+  listing_id: number;
+  excluded_reason: 'BUDGET' | 'GRADE' | 'DISTANCE' | 'FRESHNESS' | 'AVAILABILITY' | 'BELOW_MIN_ORDER';
+  detail: string;
+  landed_price_per_kg?: number | null;
+  distance_km?: number | null;
+}
+
+export interface MatchingCandidatesResponse {
+  requirement: {
+    id: number;
+    crop: { id: number; name: string };
+    grade_min: string;
+    quantity_kg: number;
+    quantity_fulfilled_kg: number;
+    max_landed_price_per_kg: number;
+    needed_by: string;
+    status: string;
+  };
+  fill_status: 'FULL' | 'PARTIAL' | 'NONE';
+  requested_kg: number;
+  fulfilled_kg: number;
+  shortfall_kg: number;
+  earliest_delivery_date: string | null;
+  allocations: AllocationItem[];
+  candidates: Candidate[];
+  near_misses: NearMiss[];
+}
+
+export interface MatchingAcceptRequest {
+  requirement_id: number;
+  allocations: AllocationItem[];
+  delivery_date: string;
+}
+
+export interface MatchingAcceptResponse {
+  orders: Order[];
+  requirement: {
+    id: number;
+    status: string;
+    quantity_fulfilled_kg: number;
+  };
+}
+
+export interface ProducerOpportunity {
+  requirement: {
+    id: number;
+    crop: { id: number; name: string };
+    grade_min: string;
+    quantity_kg: number;
+    quantity_fulfilled_kg: number;
+    max_landed_price_per_kg: number;
+    needed_by: string;
+  };
+  buyer: {
+    id: number;
+    org_name: string;
+    buyer_type: string;
+    city?: string | null;
+    state?: string | null;
+  };
+  distance_km: number;
+  landed_price_per_kg: number;
+  scores: MatchingScores;
+  reasons: string[];
+}
+
+export interface ProducerOpportunitiesResponse {
+  listing: {
+    id: number;
+    crop: { id: number; name: string };
+    grade: string;
+    quantity_available_kg: number;
+    ask_price_per_kg: number;
+  };
+  opportunities: ProducerOpportunity[];
+  hub_context?: {
+    hub: { id: number; name: string };
+    forecast_7d_kg: number;
+    status: 'SHORTAGE' | 'BALANCED' | 'SURPLUS';
+  } | null;
+}
+
 

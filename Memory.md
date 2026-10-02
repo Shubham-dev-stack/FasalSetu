@@ -18,10 +18,10 @@ Update rules: Execution.md §8. Never record results that were not produced by a
 | Item | State |
 |---|---|
 | Documentation package (14 files + AGENTS.md) | **Complete** (moved to `docs/` with README, Memory, AGENTS at root) |
-| Source code | **Phase 6 complete** (Demand Forecasting ML Pipeline + Strictly Causal Imputation + Train+Val Fit + Honesty Gate + Forecast Endpoints + TimedCache 1h TTL + Rule D-026 Nearest-Hub Supply Attribution + Forecast UI & Charting + Model Card Modal) |
-| Current implementation phase | **Phase 6 complete — next: Phase 7** (Deterministic Matching Engine) |
-| Tests executed | **86 backend tests passed** (`pytest -v`), **27 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
-| Measured metrics | **Demand Forecasting verified**: LightGBM direct point + quantile models trained on Train split, evaluated on Val & held-out Test, deployed model refit on **Train+Val ONLY**. Gate **PASSED** (val_MAE 105.42 vs B2 134.54; test_MAE 104.66 vs B2 126.45; test 80% interval coverage 79.62%). Zero future leakage verified under causal forward-fill imputation. Rule D-026 supply attribution strictly allocates active lots to nearest hub center. Seasonal naive fallback operational for history <35 days with null interval bounds. |
+| Source code | **Phase 7 complete** (Deterministic Matching Engine & Multi-Source Allocation + F1–F6 Hard Filtering + Candidate Scoring + Greedy Allocation + Near-Miss Diagnostics + Atomic PLACED Order Acceptance + 409 STALE_ALLOCATION + Producer Reverse Opportunities + MatchPage UI + Opportunities Modal) |
+| Current implementation phase | **Phase 7 complete — next: Phase 8** (Logistics Cost Calculator & Fleet APIs) |
+| Tests executed | **102 backend tests passed** (`pytest -q`), **34 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
+| Measured metrics | **Deterministic Matching Engine verified**: Scoring is pure & stateless, bounded $[0.0, 1.0]$. Hard filters F1–F6 enforced. Deterministic tie-breaking on `(-total_score, landed_price, listing_id)`. Multi-source greedy allocation satisfies below-min-order constraints and max 5 near-misses. Acceptance is atomic and concurrency-safe via conditional quantity updates, recording `OrderEvent` and recalculating requirement fulfillment. R3 partial (300 kg / 1,000 kg from L10) and R8 shortfall (1,500 kg shortfall, L13 budget near-miss) verified on seed state. |
 
 
 
@@ -98,8 +98,10 @@ Completed:
 
 - Phase 4: Buyer Module: `BuyerProfileOut`/`BuyerProfileUpdate` schemas, `GET/PATCH /buyers/me`, `POST/GET/PATCH /requirements`, `GET /requirements/{id}` with `RequirementDetailResponse`, dynamic expiry evaluation on GET and PATCH, strict status validations, object-level authorization, and deterministic seeding of requirements `R1`–`R8`.
 - Phase 5: Unified Marketplace + Discovery: `POST /orders`, `GET /orders`, `GET /orders/{id}`, `POST /orders/{id}/transition`, atomic conditional reservation on Listing, concurrency-safe requirement fulfillment, financial snapshotting (farmgate, dedicated transport, 2% platform fee), deterministic seed orders O1–O6 (`CONFIRMED`, unrouted) and H1–H4 (`DELIVERED`, historical), frontend `MarketplacePage`, `OrderModal`, `OrdersPage`, and `OrderDetailPage`.
+- Phase 6: Demand Forecasting ML Pipeline: LightGBM quantile regression models, causal forward-fill imputation, Train+Val refit, validation honesty gate, fallback mechanism, TTL caching, `GET /forecasts/demand`, `GET /forecasts/hubs`, `GET /forecasts/model-info`, frontend forecast charts, hub supply-demand ranking, demand panel on listing creation.
+- Phase 7: Smart Matching & Allocation: Deterministic F1–F6 hard filters, multi-factor scoring (price 0.40, distance 0.20, freshness 0.20, fill 0.20), tie-breaking (-score, price, id), greedy multi-source allocation with below-min-order handling, max 5 near-miss diagnostics, atomic conditional `Listing` quantity updates on acceptance creating `PLACED` orders and `OrderEvent` records with requirement fulfillment recalculation, 409 `STALE_ALLOCATION` concurrency guard, reverse producer opportunities with hub demand context, frontend `/buyer/requirements/:id/match` MatchPage with interactive allocation/cards/accordion/delivery-date and `[Buyer Matches]` modal on producer listings.
 
-Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 6 through 13).
+Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 8 through 13).
 
 ## 12. Future work
 
@@ -107,7 +109,7 @@ PRD §18. Highlights: real demand data, Agmarknet/eNAM feeds, payments, individu
 
 ## 13. Next action
 
-1. Proceed to **Phase 6** (Phases.md §7): Demand Intelligence / ML Demand Forecast (`GET /forecasts/demand`, `GET /forecasts/hubs`, `GET /forecasts/model-info`, LightGBM model training pipeline, model card, fallback validation, Demand Intelligence UI).
+1. Proceed to **Phase 8** (Phases.md §10): Logistics Cost Calculator & Fleet APIs (`POST /logistics/estimate`, `GET /logistics/vehicles`, `NO_VEHICLE_AVAILABLE` handling, frontend logistics estimate cards and fleet tables).
 
 
 

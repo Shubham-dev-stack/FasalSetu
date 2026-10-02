@@ -10,6 +10,7 @@ import { NewListingPage } from './pages/producer/NewListingPage';
 import { ProducerProfilePage } from './pages/producer/ProducerProfilePage';
 import { RequirementsPage } from './pages/buyer/RequirementsPage';
 import { NewRequirementPage } from './pages/buyer/NewRequirementPage';
+import { MatchPage } from './pages/buyer/MatchPage';
 import { BuyerProfilePage } from './pages/buyer/BuyerProfilePage';
 import { MarketplacePage } from './pages/market/MarketplacePage';
 import { OrdersPage } from './pages/orders/OrdersPage';
@@ -128,6 +129,15 @@ export default function App() {
             element={
               <ProtectedLayout title="Post Procurement Requirement">
                 <NewRequirementPage />
+              </ProtectedLayout>
+            }
+          />
+
+          <Route
+            path="/buyer/requirements/:id/match"
+            element={
+              <ProtectedLayout title="Matching & Multi-Source Allocation">
+                <MatchPage />
               </ProtectedLayout>
             }
           />

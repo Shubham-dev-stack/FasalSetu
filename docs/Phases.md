@@ -105,16 +105,17 @@ Timeboxing rule: if a phase reaches 1.5× its estimate, stop and apply the cut l
 - **Exit:** panel updates when crop/quantity changes; `model_card.json` exists with real measured metrics; tag `phase-06-done`.
 - **Risks:** time sink in tuning (cap: no tuning beyond the `num_leaves` grid); gate fails → ship fallback honestly; LightGBM native lib (`libgomp`) in Docker.
 
-## 9. PHASE 7 — Smart matching (2.5 h)
+## 9. PHASE 7 — Smart matching (2.5 h) — COMPLETE
 
 - **Objective:** ranked, explained candidates with partial/multi-source allocation and accept.
 - **Dependencies:** Phases 4, 5, 6 (context), Phase 1 cost utils.
 - **Deliverables:** `matching/scoring.py` (pure), `matching/service.py`, `GET /matching/requirements/{id}/candidates`, `POST /matching/accept`, `GET /matching/listings/{id}/opportunities` (S); `matching.yaml`; frontend match screen (candidates table/cards with factor bars, allocation summary, shortfall banner, near-misses, accept), producer opportunities section (S).
-- **Files:** `modules/matching/*`, `frontend/src/pages/buyer/MatchPage.tsx`, `components/domain/{CandidateCard,ScoreBreakdown}.tsx`.
-- **Acceptance:** AC-MAT-01…08.
+- **Files:** `modules/matching/*`, `frontend/src/pages/buyer/MatchPage.tsx`, `components/domain/{CandidateCard,ScoreBreakdown,ProducerOpportunitiesModal}.tsx`.
+- **Acceptance:** AC-MAT-01…08 (All PASSED).
 - **Test cases:** filter each rule (grade, budget, distance, freshness, availability); partial; none; min-order skip; multi-source sum ≤ Q; accept revalidation and atomicity; stale allocation 409; R3 partial and R8 none on seed.
 - **Exit:** accept creates PLACED orders; tag `phase-07-done`.
 - **Risks:** scoring ties (deterministic tie-break); unit errors in landed price.
+- **Status:** **Complete**. 102 backend tests passing, 34 frontend tests passing, ruff passed, vite build passed. AC-MAT-01 through AC-MAT-08 fully verified.
 
 ## 10. PHASE 8 — Logistics (1.0 h)
 

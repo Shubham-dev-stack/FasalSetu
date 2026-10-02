@@ -235,7 +235,7 @@ Seeding orders goes through the real reservation service, so **available quantit
 |---|---|---|---|---|---|---|---|
 | R1 | B1 | Tomato | B | 1,500 | 29.00 | +1 day | Live demo: match before/after new listing |
 | R2 | B5 | Onion | B | 6,500 | 28.00 | +3 | Multi-source allocation |
-| R3 | B2 | Cauliflower | A | 1,000 | 36.00 | +2 | Partial fill (only L10, 300 kg, is Grade A) |
+| R3 | B2 | Cauliflower | A | 1,000 | 37.00 | +2 | Partial fill (only L10, 300 kg, is Grade A) |
 | R4 | B3 | Potato | B | 3,000 | 24.00 | +2 | Normal match |
 | R5 | B4 | Tomato | C | 1,000 | 27.00 | +2 | Low-grade tolerant processor |
 | R6 | B1 | Green Chilli | B | 300 | 55.00 | +2 | Small lots |

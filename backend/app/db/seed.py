@@ -541,7 +541,7 @@ def seed_demo_requirements(db: Session) -> dict[str, int]:
     # Per Data.md §12:
     # R1: B1, Tomato(1), Grade B, 1500 kg, Max landed 29.00, needed_by = today + 1
     # R2: B5, Onion(2), Grade B, 6500 kg, Max landed 28.00, needed_by = today + 3
-    # R3: B2, Cauliflower(4), Grade A, 1000 kg, Max landed 36.00, needed_by = today + 2
+    # R3: B2, Cauliflower(4), Grade A, 1000 kg, Max landed 37.00, needed_by = today + 2
     # R4: B3, Potato(3), Grade B, 3000 kg, Max landed 24.00, needed_by = today + 2
     # R5: B4, Tomato(1), Grade C, 1000 kg, Max landed 27.00, needed_by = today + 2
     # R6: B1, Green Chilli(5), Grade B, 300 kg, Max landed 55.00, needed_by = today + 2
@@ -550,7 +550,7 @@ def seed_demo_requirements(db: Session) -> dict[str, int]:
     requirements_data = [
         {"id": 1, "buyer_id": 1, "crop_id": 1, "grade_min": "B", "quantity_kg": 1500.0, "max_landed_price_per_kg": 29.00, "days_ahead": 1, "notes": "Live demo: match before/after new listing"},
         {"id": 2, "buyer_id": 5, "crop_id": 2, "grade_min": "B", "quantity_kg": 6500.0, "max_landed_price_per_kg": 28.00, "days_ahead": 3, "notes": "Multi-source allocation"},
-        {"id": 3, "buyer_id": 2, "crop_id": 4, "grade_min": "A", "quantity_kg": 1000.0, "max_landed_price_per_kg": 36.00, "days_ahead": 2, "notes": "Partial fill"},
+        {"id": 3, "buyer_id": 2, "crop_id": 4, "grade_min": "A", "quantity_kg": 1000.0, "max_landed_price_per_kg": 37.00, "days_ahead": 2, "notes": "Partial fill"},
         {"id": 4, "buyer_id": 3, "crop_id": 3, "grade_min": "B", "quantity_kg": 3000.0, "max_landed_price_per_kg": 24.00, "days_ahead": 2, "notes": "Normal match"},
         {"id": 5, "buyer_id": 4, "crop_id": 1, "grade_min": "C", "quantity_kg": 1000.0, "max_landed_price_per_kg": 27.00, "days_ahead": 2, "notes": "Low-grade tolerant processor"},
         {"id": 6, "buyer_id": 1, "crop_id": 5, "grade_min": "B", "quantity_kg": 300.0, "max_landed_price_per_kg": 55.00, "days_ahead": 2, "notes": "Small lots"},

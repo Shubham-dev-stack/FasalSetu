@@ -8,6 +8,7 @@ from app.core.errors import register_error_handlers
 from app.modules.auth.router import router as auth_router
 from app.modules.forecasting.router import router as forecasting_router
 from app.modules.listings.router import router as listings_router
+from app.modules.matching.router import router as matching_router
 from app.modules.orders.router import router as orders_router
 from app.modules.profiles.router import router as profiles_router
 from app.modules.reference.router import router as reference_router
@@ -74,6 +75,7 @@ def create_app() -> FastAPI:
     app.include_router(profiles_router, prefix="/api/v1")
     app.include_router(listings_router, prefix="/api/v1")
     app.include_router(requirements_router, prefix="/api/v1")
+    app.include_router(matching_router, prefix="/api/v1")
     app.include_router(orders_router, prefix="/api/v1")
     app.include_router(forecasting_router, prefix="/api/v1")
 

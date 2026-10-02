@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Requirement } from '../../api/types';
 import { RequirementStatusChip } from './RequirementStatusChip';
-import { Calendar, Clock, Edit2, Info } from 'lucide-react';
+import { Calendar, Clock, Edit2, Info, Sparkles } from 'lucide-react';
 
 interface RequirementCardProps {
   requirement: Requirement;
@@ -121,16 +122,28 @@ export const RequirementCard: React.FC<RequirementCardProps> = ({
       </div>
 
       {/* Action Buttons */}
-      {showActions && isEditable && onEdit && (
-        <div className="pt-2">
-          <button
-            type="button"
-            onClick={() => onEdit(requirement)}
-            className="w-full inline-flex items-center justify-center space-x-1.5 py-1.5 px-3 rounded-lg border border-gray-300 text-xs font-semibold text-ink hover:bg-gray-50 transition-colors"
-          >
-            <Edit2 className="w-3.5 h-3.5 text-muted" />
-            <span>Edit / Cancel Requirement</span>
-          </button>
+      {showActions && (
+        <div className="pt-2 flex items-center space-x-2">
+          {isEditable && (
+            <Link
+              to={`/buyer/requirements/${requirement.id}/match`}
+              className="flex-1 inline-flex items-center justify-center space-x-1.5 py-1.5 px-3 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary-hover transition-colors shadow-xs"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Find Matches</span>
+            </Link>
+          )}
+
+          {isEditable && onEdit && (
+            <button
+              type="button"
+              onClick={() => onEdit(requirement)}
+              className="inline-flex items-center justify-center space-x-1.5 py-1.5 px-3 rounded-lg border border-gray-300 text-xs font-semibold text-ink hover:bg-gray-50 transition-colors"
+            >
+              <Edit2 className="w-3.5 h-3.5 text-muted" />
+              <span>Edit</span>
+            </button>
+          )}
         </div>
       )}
     </div>
