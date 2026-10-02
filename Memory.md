@@ -18,10 +18,11 @@ Update rules: Execution.md §8. Never record results that were not produced by a
 | Item | State |
 |---|---|
 | Documentation package (14 files + AGENTS.md) | **Complete** (moved to `docs/` with README, Memory, AGENTS at root) |
-| Source code | **Phase 11 complete** (Platform Impact Analytics Dashboard + Overview API `GET /analytics/overview` with committed KPIs, 14-day orders series, modelled price gap + Hub x Crop Supply-Demand Matrix API `GET /analytics/supply-demand` with Rule D-026 single-hub attribution and status chips + Full Provenance & Disclaimer Handlers + Frontend AnalyticsPage Integration) |
-| Current implementation phase | **Phase 11 complete — next: Phase 12** (Integration, Reset & Demo Script End-to-End) |
-| Tests executed | **136 backend tests passed** (`pytest -q`), **45 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
-| Measured metrics | **Impact Analytics verified**: Platform KPIs independently reconciled with underlying committed orders (volume 6,350 kg, farmgate value ₹140,100), requirement fill rate 8.05%, transport cost ₹8.54/kg. Modelled price gap evaluated against traditional APMC chain scenario with transparent assumptions. Approved route plan savings dynamically reflected in KPIs. Hub x crop matrix correctly maps 25 pairs with single-hub produce attribution (no double-counting). AC-ANL-01..03 passed. Zero regression across Phase 1–10. |
+| Source code | **Phase 12 complete** (End-to-End Integration, Reset & Demo Verification + `POST /system/reset-demo` & `/api/v1/system/reset-demo` with full table drop/recreate, forecast cache purge, deterministic reseeding + Multi-stage Dockerfile & single-image SPA static mount D-008 + Navbar operator demo reset trigger + Comprehensive integration test suite `test_integration_phase12.py` + NFR spot checks and Demo.md §11 verification log completed) |
+| Current implementation phase | **Phase 12 complete — next: Phase 13** (Testing + Polish + Demo Readiness freeze) |
+| Tests executed | **140 backend tests passed** (`pytest -q`), **45 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
+| Measured metrics | **Zero-drift idempotency verified**: Full Demo.md §4 path (PREDICT → MATCH → MOVE → SELL → ANALYSE) executed twice sequentially from fresh resets with identical results. R1 Tomato candidates move from 0 to rank-1 single-source full fill (1,500 kg @ ₹25.53 landed). Route plan optimized 909.1 km vs 1,307.3 km baseline (30.5% km savings, 14.7% cost savings, solve time 5.08s). Waterfall reconciles ₹23.00 + ₹3.52 + ₹0.46 = ₹26.98. NFR latencies: health p95=7.64ms, reference p95=9.02ms, listings p95=20.02ms, forecast demand p95=9.91ms (<300ms target), matching candidates p95=15.95ms, analytics p95=43.23ms. All NFR targets satisfied. |
+
 
 
 
@@ -105,8 +106,9 @@ Completed:
 - Phase 9: Route Optimization: OR-Tools capacitated pickup-and-delivery VRP solver (`optimize_routes`), greedy fallback, multi-stop pickup and delivery grouping, `route_plans` proposal and lifecycle management (`POST /routes/optimize`, `GET /routes/plans`, `POST /routes/plans/{id}/approve`, `POST /routes/plans/{id}/discard`), atomic order state updates to `ROUTED`, shipment creation, stale plan concurrency guard (409), logistics savings against modelled direct baseline, frontend `RouteOptimization` and `RouteMap` components.
 - Phase 10: Price Transparency: Authoritative per-order waterfall arithmetic (`GET /pricing/breakdown`), baseline/reference APMC modal price and trend lookup (`GET /pricing/benchmark`), research-backed traditional multi-tier scenario comparison (`compute_traditional_scenario`), deterministic fair price band (`[L, U]`), provenance and disclaimer compliance (`AGMARKNET_SNAPSHOT` vs `SYNTHETIC_DEMO`, `basis: "MODELLED_SCENARIO"`), and frontend `OrderPriceBreakdown` and `DemandPanel` integration.
 - Phase 11: Impact Analytics Dashboard: Platform KPI overview (`GET /analytics/overview`) aggregating committed orders, transacted produce volume/value, requirement fill rate, transport costs, and approved route plan savings; 14-day daily orders/volume timeline; modelled price scenario comparisons; Hub x Crop supply-vs-demand gap matrix (`GET /analytics/supply-demand`) with Rule D-026 single-hub produce attribution (no double-counting) and status chips; full frontend `AnalyticsPage` dashboard integration.
+- Phase 12: End-to-End Integration, Demo Verification & Performance Readiness: Zero-drift reset endpoint (`POST /system/reset-demo` and `/api/v1/system/reset-demo`) resetting tables and clearing cache, full Demo.md 3-minute & 5-minute paths executed twice sequentially from fresh resets with zero drift, edge cases (R3 partial fill, R8 budget near-miss, R2 multi-source), object-level security guards verified, NFR spot checks passing all latency & solver targets, multi-stage Dockerfile and SPA static mounting (D-008), Navbar demo reset trigger for operators.
 
-Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 12 and 13).
+Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phase 13: Testing + Polish + Demo Readiness freeze).
 
 ## 12. Future work
 
@@ -114,7 +116,8 @@ PRD §18. Highlights: real demand data, Agmarknet/eNAM feeds, payments, individu
 
 ## 13. Next action
 
-1. Proceed to **Phase 12** (Phases.md §14): Integration & Full Demo Path (`POST /system/reset-demo`, persona switcher in top bar, deep links between screens, consistent formatting helpers, Dockerfile and static mount, full Demo.md script verification).
+1. Proceed to **Phase 13** (Phases.md §15): Final Testing, Polish & Demo Readiness freeze (responsive/accessibility pass, empty/error state check, demo fallback recording/screenshots, code freeze, `demo-ready` tag).
+
 
 
 
