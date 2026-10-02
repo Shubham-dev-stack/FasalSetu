@@ -17,6 +17,7 @@ import { OrdersPage } from './pages/orders/OrdersPage';
 import { OrderDetailPage } from './pages/orders/OrderDetailPage';
 import { ForecastPage } from './pages/forecast/ForecastPage';
 import { LogisticsOpsPage } from './pages/ops/LogisticsOpsPage';
+import { RoutePlanPage } from './pages/ops/RoutePlanPage';
 
 const ProtectedLayout: React.FC<{ children: React.ReactNode; title?: string }> = ({
   children,
@@ -193,6 +194,15 @@ export default function App() {
             element={
               <ProtectedLayout title="Logistics & Fleet Dispatch">
                 <LogisticsOpsPage />
+              </ProtectedLayout>
+            }
+          />
+
+          <Route
+            path="/ops/routes/:planId"
+            element={
+              <ProtectedLayout title="Route Optimization Plan">
+                <RoutePlanPage />
               </ProtectedLayout>
             }
           />

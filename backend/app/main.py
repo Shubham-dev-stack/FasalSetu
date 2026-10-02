@@ -14,6 +14,7 @@ from app.modules.orders.router import router as orders_router
 from app.modules.profiles.router import router as profiles_router
 from app.modules.reference.router import router as reference_router
 from app.modules.requirements.router import router as requirements_router
+from app.modules.routes.router import router as routes_router
 from ml.predict import get_model_artifacts
 
 
@@ -80,6 +81,7 @@ def create_app() -> FastAPI:
     app.include_router(orders_router, prefix="/api/v1")
     app.include_router(forecasting_router, prefix="/api/v1")
     app.include_router(logistics_router, prefix="/api/v1")
+    app.include_router(routes_router, prefix="/api/v1")
 
     return app
 

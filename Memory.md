@@ -18,10 +18,10 @@ Update rules: Execution.md §8. Never record results that were not produced by a
 | Item | State |
 |---|---|
 | Documentation package (14 files + AGENTS.md) | **Complete** (moved to `docs/` with README, Memory, AGENTS at root) |
-| Source code | **Phase 8 complete** (Dedicated Logistics Trip Cost Calculator + Multi-Trip Vehicle Sizing + Fleet Inventory Endpoints + `POST /logistics/estimate` + `GET /logistics/vehicles` + `NO_VEHICLE_AVAILABLE` 409 + Frontend LogisticsOpsPage & Live LogisticsEstimate Component) |
-| Current implementation phase | **Phase 8 complete — next: Phase 9** (OR-Tools Route Optimization & Multi-Stop Delivery Plans) |
-| Tests executed | **112 backend tests passed** (`pytest -q`), **38 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
-| Measured metrics | **Logistics & Fleet APIs verified**: Dedicated round-trip logistics calculation strictly implements `fixed_cost + cost_per_km * distance_km * return_factor(2.0)`, cost-per-kg, and speed/service-stop transit hours. Oversize loads (>4,000 kg) correctly allocate largest types + remainder fit. 409 `NO_VEHICLE_AVAILABLE` enforced when active fleet is empty. Fleet inventory endpoint `GET /logistics/vehicles` returns 5 seeded vehicles. Zero regression across all Phase 1–7 tests. |
+| Source code | **Phase 9 complete** (OR-Tools Capacitated Pickup-and-Delivery VRP + Greedy Fallback Heuristic + Route Plan Lifecycle `PROPOSED` → `APPROVED` / `DISCARDED` + Atomic Shipment Creation & Order Linking + Cost Allocation by `kg·km` share + Concurrency Revalidation `409 STALE_PLAN` + Manual Shipment Transitions `PLANNED` → `DISPATCHED` → `DELIVERED` + Order Event Audit Logging + Frontend LogisticsOpsPage & RoutePlanPage) |
+| Current implementation phase | **Phase 9 complete — next: Phase 10** (Price Intelligence & Transparency Waterfall Engine) |
+| Tests executed | **120 backend tests passed** (`pytest -q`), **41 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
+| Measured metrics | **Route Optimization & Plan Lifecycle verified**: Multi-stop PDP with capacity constraints and pickup-preceding-drop precedence verified with OR-Tools and greedy fallback. Baseline comparison honestly models dedicated unconsolidated round trips per order. Concurrency revalidation enforces `409 STALE_PLAN` if order status changes before approval. On approval, atomic shipment & stop creation and `kg·km` share transport cost allocation are performed with order event audit logging. Zero regression across all Phase 1–8 tests. |
 
 
 

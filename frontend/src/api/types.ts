@@ -695,4 +695,115 @@ export interface VehicleListResponse {
   items: FleetVehicle[];
 }
 
+export interface StopOut {
+  sequence: number;
+  stop_type: 'DEPOT_START' | 'PICKUP' | 'DROP' | 'DEPOT_END';
+  order_id?: number | null;
+  label: string;
+  lat: number;
+  lng: number;
+  load_after_kg: number;
+  cum_distance_km: number;
+  eta_min_from_start: number;
+}
+
+export interface PlanVehicleOut {
+  id: number;
+  name: string;
+  vehicle_type: string;
+  capacity_kg: number;
+}
+
+export interface PlanShipmentOut {
+  temp_id: string;
+  shipment_id?: number | null;
+  vehicle: PlanVehicleOut;
+  total_distance_km: number;
+  total_cost: number;
+  peak_load_kg: number;
+  utilization_pct: number;
+  est_duration_min: number;
+  stops: StopOut[];
+  geometry: [number, number][];
+}
+
+export interface PlanTotals {
+  optimized_km: number;
+  optimized_cost: number;
+  baseline_km: number;
+  baseline_cost: number;
+  savings_km: number;
+  savings_cost: number;
+  savings_pct_cost: number;
+  vehicles_used: number;
+  avg_utilization_pct: number;
+}
+
+export interface UnassignedOrder {
+  order_id: number;
+  quantity_kg: number;
+  reason: string;
+}
+
+export interface RoutePlanResponse {
+  plan_id: string;
+  status: 'PROPOSED' | 'APPROVED' | 'DISCARDED';
+  method: string;
+  solver_status?: string | null;
+  solve_time_ms: number;
+  distance_source: string;
+  totals: PlanTotals;
+  baseline_note: string;
+  shipments: PlanShipmentOut[];
+  unassigned: UnassignedOrder[];
+  skipped_order_ids: number[];
+  warnings: string[];
+}
+
+export interface RoutePlanSummaryItem {
+  id: string;
+  status: 'PROPOSED' | 'APPROVED' | 'DISCARDED';
+  method: string;
+  orders_count: number;
+  vehicles_used: number;
+  optimized_km: number;
+  optimized_cost: number;
+  savings_pct: number;
+  created_at: string;
+  approved_at?: string | null;
+}
+
+export interface RoutePlanListResponse {
+  items: RoutePlanSummaryItem[];
+  total: number;
+}
+
+export interface ShipmentDetailResponse {
+  id: number;
+  plan_id: string;
+  vehicle_id: number;
+  vehicle_name: string;
+  vehicle_type: string;
+  status: 'PLANNED' | 'DISPATCHED' | 'DELIVERED';
+  total_distance_km: number;
+  total_cost: number;
+  peak_load_kg: number;
+  utilization_pct: number;
+  est_duration_min: number;
+  stops: StopOut[];
+  order_ids: number[];
+}
+
+export interface RoutePlanApproveResponse {
+  plan: RoutePlanResponse;
+  shipments: ShipmentDetailResponse[];
+}
+
+export interface OptimizeRoutesRequest {
+  order_ids?: number[];
+  time_limit_s?: number;
+  distance_mode?: 'HAVERSINE' | 'OSRM';
+}
+
+
 
