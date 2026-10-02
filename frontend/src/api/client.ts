@@ -36,17 +36,13 @@ export async function fetchHealth(): Promise<HealthResponse> {
   return handleResponse<HealthResponse>(response);
 }
 
-export async function loginApi(username: string, password: string): Promise<AuthResponse> {
-  const formData = new URLSearchParams();
-  formData.append('username', username);
-  formData.append('password', password);
-
+export async function loginApi(email: string, password: string): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE}/auth/login`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/json',
     },
-    body: formData.toString(),
+    body: JSON.stringify({ email, password }),
   });
   return handleResponse<AuthResponse>(response);
 }
