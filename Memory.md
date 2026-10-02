@@ -102,7 +102,10 @@ Completed:
 - Phase 7: Smart Matching & Allocation: Deterministic F1–F6 hard filters, multi-factor scoring (price 0.40, distance 0.20, freshness 0.20, fill 0.20), tie-breaking (-score, price, id), greedy multi-source allocation with below-min-order handling, max 5 near-miss diagnostics, atomic conditional `Listing` quantity updates on acceptance creating `PLACED` orders and `OrderEvent` records with requirement fulfillment recalculation, 409 `STALE_ALLOCATION` concurrency guard, reverse producer opportunities with hub demand context, frontend `/buyer/requirements/:id/match` MatchPage with interactive allocation/cards/accordion/delivery-date and `[Buyer Matches]` modal on producer listings.
 - Phase 8: Logistics Cost Calculator & Fleet APIs: Dedicated single-trip logistics estimation (`POST /logistics/estimate`), vehicle sizing per ML.md §11 (smallest fitting type if $\le 4,000$ kg; multiple trips of largest type + remainder fit if $> 4,000$ kg), transit hours estimation, `409 NO_VEHICLE_AVAILABLE` guard, public fleet inventory endpoint (`GET /logistics/vehicles`), frontend `LogisticsOpsPage` at `/ops/logistics`, `LogisticsEstimate` component, and live transport cost calculation in direct `OrderModal`.
 
-Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 9 through 13).
+- Phase 9: Route Optimization: OR-Tools capacitated pickup-and-delivery VRP solver (`optimize_routes`), greedy fallback, multi-stop pickup and delivery grouping, `route_plans` proposal and lifecycle management (`POST /routes/optimize`, `GET /routes/plans`, `POST /routes/plans/{id}/approve`, `POST /routes/plans/{id}/discard`), atomic order state updates to `ROUTED`, shipment creation, stale plan concurrency guard (409), logistics savings against modelled direct baseline, frontend `RouteOptimization` and `RouteMap` components.
+- Phase 10: Price Transparency: Authoritative per-order waterfall arithmetic (`GET /pricing/breakdown`), baseline/reference APMC modal price and trend lookup (`GET /pricing/benchmark`), research-backed traditional multi-tier scenario comparison (`compute_traditional_scenario`), deterministic fair price band (`[L, U]`), provenance and disclaimer compliance (`AGMARKNET_SNAPSHOT` vs `SYNTHETIC_DEMO`, `basis: "MODELLED_SCENARIO"`), and frontend `OrderPriceBreakdown` and `DemandPanel` integration.
+
+Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 11 through 13).
 
 ## 12. Future work
 
@@ -110,7 +113,7 @@ PRD §18. Highlights: real demand data, Agmarknet/eNAM feeds, payments, individu
 
 ## 13. Next action
 
-1. Proceed to **Phase 9** (Phases.md §11): Route Optimization (`POST /routes/optimize`, `GET /routes/plans`, `POST /routes/plans/{id}/approve`, `POST /routes/plans/{id}/discard`, OR-Tools multi-stop capacitated VRP solver with greedy fallback, route maps and plan management UI).
+1. Proceed to **Phase 11** (Phases.md §13): Impact Analytics Dashboard (`GET /analytics/summary`, `GET /analytics/farmer-impact`, `GET /analytics/buyer-impact`, `GET /analytics/logistics-impact`, frontend `AnalyticsPage` with summary metric cards, distribution charts, and methodology/disclaimer drawers).
 
 
 
