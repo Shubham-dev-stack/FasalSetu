@@ -30,7 +30,8 @@ COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 ENV PYTHONPATH=/app/backend \
     STATIC_DIR=/app/frontend/dist \
-    DEMO_MODE=false \
+    APP_ENV=production \
+    DEMO_MODE=true \
     PORT=8000
 
 WORKDIR /app/backend
