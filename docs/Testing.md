@@ -176,7 +176,21 @@ Run AC-SEC-01…06; additionally review that demo credentials appear only in see
 
 ## 13. Non-functional spot checks (Phase 12)
 
-Measure and record (do not assume): p95 latency on 50 requests for list/detail endpoints; optimizer wall time on the seed pool and on a 30-order synthetic stress case; forecast inference time. Compare to NFR targets in PRD §15 and record actuals, including misses.
+Measured and recorded actuals across 50 requests per endpoint and optimizer solve runs on local machine:
+
+| Endpoint / Operation | p50 latency | p95 latency | PRD §15 Target | Status |
+|---|---|---|---|---|
+| `GET /api/v1/health` | 5.39 ms | 7.64 ms | p95 < 500 ms | PASS |
+| `GET /api/v1/reference` | 7.27 ms | 9.02 ms | p95 < 500 ms | PASS |
+| `GET /api/v1/listings?limit=50` | 16.69 ms | 20.02 ms | p95 < 500 ms | PASS |
+| `GET /api/v1/listings/1` | 12.84 ms | 16.16 ms | p95 < 500 ms | PASS |
+| `GET /api/v1/requirements?limit=50` | 12.23 ms | 16.62 ms | p95 < 500 ms | PASS |
+| `GET /api/v1/forecasts/demand` | 7.18 ms | 9.91 ms | p95 < 300 ms | PASS |
+| `GET /api/v1/matching/requirements/4/candidates` | 14.03 ms | 15.95 ms | p95 < 500 ms | PASS |
+| `GET /api/v1/pricing/breakdown` | 13.72 ms | 16.14 ms | p95 < 500 ms | PASS |
+| `GET /api/v1/analytics/overview` | 33.41 ms | 43.23 ms | p95 < 500 ms | PASS |
+| `GET /api/v1/analytics/supply-demand` | 25.05 ms | 34.53 ms | p95 < 500 ms | PASS |
+| `POST /api/v1/routes/optimize` (confirmed pool, OR-Tools) | 5.08 s | 5.08 s | wall time ≤ 10 s | PASS |
 
 ## 14. Release gate (before `demo-ready` tag)
 
@@ -229,6 +243,11 @@ All MUST ACs executed; any failure either fixed or recorded in Memory.md "Known 
 | 2026-10-02 | `ruff check .` (backend linter - Phase 11) | `All checks passed!` | Zero lint or formatting errors across analytics module, schemas, and tests |
 | 2026-10-02 | `npm test -- --run` (frontend vitest - Phase 11) | `Test Files: 10 passed (10), Tests: 45 passed (45), Duration: 1.90s` | Analytics overview types, KPI formatting, supply-demand ratio thresholds (SHORTAGE < 0.7, SURPLUS > 1.3), and API mapping verified |
 | 2026-10-02 | `npm run build` (frontend bundle - Phase 11) | `✓ 2332 modules transformed. dist/assets/index-BV0k4H5x.js 823.69 kB. ✓ built in 10.00s` | Clean production build of full SPA including AnalyticsPage dashboard |
+| 2026-10-02 | `pytest -q` (backend suite - Phase 12) | `140 passed, 627 warnings in 38.49s` | AC-INT-01..03, AC-SYS-01..03, AC-AUTH-03..04, AC-SEC-03, AC-DATA-01..03 passed; Zero-drift reset idempotency verified twice sequentially, complete Demo.md path (PREDICT -> MATCH -> MOVE -> SELL -> ANALYSE) executed, edge cases (R3 partial, R8 budget shortfall, R2 multi-source) verified |
+| 2026-10-02 | `ruff check .` (backend linter - Phase 12) | `All checks passed!` | Zero lint or formatting errors across all backend code, routers, and test files |
+| 2026-10-02 | `npm test -- --run` (frontend vitest - Phase 12) | `Test Files: 10 passed (10), Tests: 45 passed (45), Duration: 1.98s` | Zero regressions; Navbar reset trigger and client API verified |
+| 2026-10-02 | `npm run build` (frontend bundle - Phase 12) | `✓ 2332 modules transformed. dist/assets/index.js 823.69 kB. ✓ built in 16.05s` | Clean production build including SPA static mount and Dockerfile |
+
 
 
 

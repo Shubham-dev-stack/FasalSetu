@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../lib/auth';
 import { DEMO_PERSONAS } from '../../api/types';
+import { resetDemoApi } from '../../api/client';
 
 interface NavbarProps {
   title?: string;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ title = 'Dashboard' }) => {
-  const { user, logout, demoLogin, loading } = useAuth();
+  const { user, token, logout, demoLogin, loading } = useAuth();
   const [showPersonaMenu, setShowPersonaMenu] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
   const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
 
   const handleSwitchPersona = async (key: string) => {
@@ -16,8 +19,37 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Dashboard' }) => {
     await demoLogin(key);
   };
 
+  const handleResetDemo = async () => {
+    if (!token) return;
+    if (
+      !window.confirm(
+        'Reset demo database to fresh deterministic seed state? All live listings and orders will be restored to initial seed.'
+      )
+    ) {
+      return;
+    }
+    setResetting(true);
+    try {
+      const res = await resetDemoApi(token);
+      setResetMessage(`Demo reset complete (${res.counts.listings ?? 0} listings, ${res.counts.orders ?? 0} orders)`);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1200);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      alert(`Reset failed: ${msg}`);
+      setResetting(false);
+    }
+  };
+
+
   return (
     <header className="bg-surface border-b border-gray-200 sticky top-0 z-30">
+      {resetMessage && (
+        <div className="bg-primary text-white text-xs font-semibold px-4 py-2 text-center shadow-md">
+          ✓ {resetMessage}
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Brand & Title */}
@@ -70,10 +102,36 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Dashboard' }) => {
                         <span className="text-[11px] text-muted">{p.location}</span>
                       </button>
                     ))}
+                    {(user?.role === 'operator' || user?.role === 'ADMIN') && (
+                      <div className="pt-1 mt-1 border-t border-gray-100">
+                        <button
+                          type="button"
+                          onClick={handleResetDemo}
+                          disabled={resetting}
+                          className="w-full text-left px-3 py-2 text-danger hover:bg-danger/10 font-semibold flex items-center justify-between"
+                        >
+                          <span>{resetting ? 'Resetting database...' : '↺ Reset Demo Data'}</span>
+                          <span className="text-[10px] uppercase bg-danger/15 text-danger px-1.5 py-0.5 rounded">Admin</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
             )}
+
+            {isDemo && (user?.role === 'operator' || user?.role === 'ADMIN') && (
+              <button
+                type="button"
+                onClick={handleResetDemo}
+                disabled={resetting}
+                className="text-xs border border-danger/30 text-danger bg-danger/5 hover:bg-danger/10 rounded-md px-2.5 py-1.5 font-medium flex items-center space-x-1"
+                title="Reset demo data to deterministic seed state"
+              >
+                <span>{resetting ? 'Resetting...' : '↺ Reset Demo'}</span>
+              </button>
+            )}
+
 
             {user && (
               <div className="flex items-center space-x-3 pl-2 border-l border-gray-200">

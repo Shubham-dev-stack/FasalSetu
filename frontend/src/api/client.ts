@@ -75,3 +75,19 @@ export async function fetchReferenceDataApi(): Promise<ReferenceDataResponse> {
   const response = await fetch(`${API_BASE}/reference`);
   return handleResponse<ReferenceDataResponse>(response);
 }
+
+export interface ResetDemoResponse {
+  status: string;
+  counts: Record<string, number>;
+}
+
+export async function resetDemoApi(token: string): Promise<ResetDemoResponse> {
+  const response = await fetch(`${API_BASE}/system/reset-demo`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return handleResponse<ResetDemoResponse>(response);
+}
+

@@ -2,8 +2,8 @@
   "dataset_id": "DS-02",
   "data_source": "SYNTHETIC_DEMO",
   "num_rows": 2250,
-  "start_date": "2026-07-03",
-  "end_date": "2026-09-30",
-  "generated_at": "2026-10-01T08:53:58.613535+00:00",
+  "start_date": "2026-07-04",
+  "end_date": "2026-10-01",
+  "generated_at": "2026-10-02T17:35:08.938250+00:00",
   "disclaimer": "Market prices are synthetic benchmarks derived from generator price levels."
 }
