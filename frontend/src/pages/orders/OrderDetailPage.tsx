@@ -305,12 +305,14 @@ export const OrderDetailPage: React.FC = () => {
 
           {/* Landed Cost Breakdown */}
           <OrderPriceBreakdown
-            quantityKg={order.quantity_kg}
-            agreedPricePerKg={order.agreed_price_per_kg}
-            transportCostPerKg={order.transport_cost_estimate_per_kg}
-            platformFeePerKg={order.platform_fee_per_kg}
-            landedPricePerKg={order.landed_price_per_kg_estimate}
-            totalAmount={order.total_amount_estimate}
+            orderId={order.id}
+            token={token}
+            fallbackQuantityKg={order.quantity_kg}
+            fallbackAgreedPricePerKg={order.agreed_price_per_kg}
+            fallbackTransportCostPerKg={order.transport_cost_estimate_per_kg}
+            fallbackPlatformFeePerKg={order.platform_fee_per_kg}
+            fallbackLandedPricePerKg={order.landed_price_per_kg_estimate}
+            fallbackTotalAmount={order.total_amount_estimate}
           />
         </div>
 

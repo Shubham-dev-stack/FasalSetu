@@ -9,10 +9,12 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { getDemandForecast, getHubsForecast, getModelInfo } from '../../api/forecasts';
+import { fetchPricingBenchmarkApi } from '../../api/pricing';
 import {
   ForecastDemandResponse,
   ForecastHubsResponse,
   ModelInfoResponse,
+  PricingBenchmarkResponse,
 } from '../../api/types';
 import { ForecastChart } from '../charts/ForecastChart';
 import { ModelInfoModal } from './ModelInfoModal';
@@ -35,6 +37,7 @@ export const DemandPanel: React.FC<DemandPanelProps> = ({
   const [demandForecast, setDemandForecast] = useState<ForecastDemandResponse | null>(null);
   const [hubsForecast, setHubsForecast] = useState<ForecastHubsResponse | null>(null);
   const [modelInfo, setModelInfo] = useState<ModelInfoResponse | null>(null);
+  const [benchmarkData, setBenchmarkData] = useState<PricingBenchmarkResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,11 +52,13 @@ export const DemandPanel: React.FC<DemandPanelProps> = ({
     Promise.all([
       getDemandForecast(nearestHubId, cropId, 7),
       getHubsForecast(cropId, 7),
+      fetchPricingBenchmarkApi({ crop_id: cropId, hub_id: nearestHubId }).catch(() => null),
     ])
-      .then(([df, hf]) => {
+      .then(([df, hf, bm]) => {
         if (!isMounted) return;
         setDemandForecast(df);
         setHubsForecast(hf);
+        if (bm) setBenchmarkData(bm);
         setLoading(false);
       })
       .catch((err) => {
@@ -80,7 +85,11 @@ export const DemandPanel: React.FC<DemandPanelProps> = ({
     }
   };
 
-  const modalPrice = approxBenchmarkModal ?? 22.5;
+  const modalPrice = benchmarkData?.benchmark
+    ? benchmarkData.benchmark.modal_price_per_kg
+    : (approxBenchmarkModal ?? 22.5);
+  const fairBand = benchmarkData?.fair_band;
+  const benchmarkSource = benchmarkData?.benchmark?.source;
   const isLgbm = demandForecast?.method === 'LIGHTGBM';
 
   // Compute 7-day total and daily avg for nearest hub
@@ -99,7 +108,7 @@ export const DemandPanel: React.FC<DemandPanelProps> = ({
           </div>
           <div>
             <h3 className="text-sm font-bold text-gray-900">Demand &amp; Price Intelligence</h3>
-            <p className="text-xs text-gray-500">Live 7-Day ML Projections &amp; Regional Hub Rankings</p>
+            <p className="text-xs text-gray-500">Live 7-Day ML Projections &amp; Market Benchmark Band</p>
           </div>
         </div>
 
@@ -131,7 +140,14 @@ export const DemandPanel: React.FC<DemandPanelProps> = ({
             <MapPin className="w-3.5 h-3.5 text-gray-400" />
             <span>Target Nearest Hub:</span>
           </span>
-          <strong className="text-gray-900 font-semibold">{nearestHubName}</strong>
+          <div className="flex items-center gap-1.5">
+            <strong className="text-gray-900 font-semibold">{nearestHubName}</strong>
+            {benchmarkSource && (
+              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-gray-200 text-gray-700">
+                {benchmarkSource}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="flex items-baseline justify-between pt-1">
@@ -144,9 +160,15 @@ export const DemandPanel: React.FC<DemandPanelProps> = ({
 
         <div className="flex items-center justify-between pt-1 border-t border-gray-200/60">
           <span className="text-gray-500">Recommended Fair Ask Band:</span>
-          <span className="font-semibold text-emerald-700 font-mono">
-            ₹{(modalPrice * 0.95).toFixed(2)} – ₹{(modalPrice * 1.15).toFixed(2)} / kg
-          </span>
+          {fairBand ? (
+            <span className="font-semibold text-emerald-700 font-mono">
+              ₹{fairBand.low.toFixed(2)} – ₹{fairBand.high.toFixed(2)} / kg
+            </span>
+          ) : (
+            <span className="font-semibold text-emerald-700 font-mono">
+              ₹{(modalPrice * 0.95).toFixed(2)} – ₹{(modalPrice * 1.15).toFixed(2)} / kg
+            </span>
+          )}
         </div>
       </div>
 

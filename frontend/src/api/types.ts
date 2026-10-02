@@ -805,5 +805,93 @@ export interface OptimizeRoutesRequest {
   distance_mode?: 'HAVERSINE' | 'OSRM';
 }
 
+export interface WaterfallPerKg {
+  farmgate: number;
+  transport: number;
+  platform_fee: number;
+  landed: number;
+}
+
+export interface WaterfallTotals {
+  farmgate_total: number;
+  transport_total: number;
+  platform_fee_total: number;
+  landed_total: number;
+}
+
+export interface PricingCropInfo {
+  id: number;
+  name: string;
+}
+
+export interface PricingHubInfo {
+  id: number;
+  name: string;
+  city?: string | null;
+  state?: string | null;
+}
+
+export interface BenchmarkInfo {
+  hub: PricingHubInfo;
+  market_name: string;
+  price_date: string;
+  modal_price_per_kg: number;
+  min_price_per_kg: number;
+  max_price_per_kg: number;
+  source: 'SYNTHETIC_DEMO' | 'AGMARKNET_SNAPSHOT' | string;
+  is_synthetic: boolean;
+}
+
+export interface ScenarioAssumptions {
+  platform_fee_pct: number;
+  commission_agent_pct: number;
+  trader_margin_pct: number;
+  retail_margin_pct: number;
+  last_mile_cost_per_kg: number;
+}
+
+export interface TraditionalScenario {
+  farmer_mandi_net_per_kg: number;
+  buyer_traditional_per_kg: number;
+  delta_farmer_pct: number;
+  delta_buyer_pct: number;
+  assumptions: ScenarioAssumptions;
+}
+
+export interface FairBand {
+  low: number;
+  high: number;
+}
+
+export interface TrendPoint {
+  date: string;
+  modal_price_per_kg: number;
+}
+
+export interface OrderPriceBreakdownResponse {
+  order_id: number;
+  crop: PricingCropInfo;
+  quantity_kg: number;
+  per_kg: WaterfallPerKg;
+  totals: WaterfallTotals;
+  transport_basis: 'ALLOCATED_ROUTE' | 'ESTIMATE' | string;
+  benchmark?: BenchmarkInfo | null;
+  scenario?: TraditionalScenario | null;
+  fair_band?: FairBand | null;
+  basis: string;
+  disclaimer: string;
+}
+
+export interface PricingBenchmarkResponse {
+  hub: PricingHubInfo;
+  benchmark?: BenchmarkInfo | null;
+  trend: TrendPoint[];
+  fair_band?: FairBand | null;
+  assumptions: ScenarioAssumptions;
+  basis: string;
+  disclaimer: string;
+}
+
+
 
 

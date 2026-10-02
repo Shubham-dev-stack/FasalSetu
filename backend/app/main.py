@@ -11,6 +11,7 @@ from app.modules.listings.router import router as listings_router
 from app.modules.logistics.router import router as logistics_router
 from app.modules.matching.router import router as matching_router
 from app.modules.orders.router import router as orders_router
+from app.modules.pricing.router import router as pricing_router
 from app.modules.profiles.router import router as profiles_router
 from app.modules.reference.router import router as reference_router
 from app.modules.requirements.router import router as requirements_router
@@ -82,6 +83,7 @@ def create_app() -> FastAPI:
     app.include_router(forecasting_router, prefix="/api/v1")
     app.include_router(logistics_router, prefix="/api/v1")
     app.include_router(routes_router, prefix="/api/v1")
+    app.include_router(pricing_router, prefix="/api/v1")
 
     return app
 

@@ -18,10 +18,10 @@ Update rules: Execution.md §8. Never record results that were not produced by a
 | Item | State |
 |---|---|
 | Documentation package (14 files + AGENTS.md) | **Complete** (moved to `docs/` with README, Memory, AGENTS at root) |
-| Source code | **Phase 9 complete** (OR-Tools Capacitated Pickup-and-Delivery VRP + Greedy Fallback Heuristic + Route Plan Lifecycle `PROPOSED` → `APPROVED` / `DISCARDED` + Atomic Shipment Creation & Order Linking + Cost Allocation by `kg·km` share + Concurrency Revalidation `409 STALE_PLAN` + Manual Shipment Transitions `PLANNED` → `DISPATCHED` → `DELIVERED` + Order Event Audit Logging + Frontend LogisticsOpsPage & RoutePlanPage) |
-| Current implementation phase | **Phase 9 complete — next: Phase 10** (Price Intelligence & Transparency Waterfall Engine) |
-| Tests executed | **120 backend tests passed** (`pytest -q`), **41 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
-| Measured metrics | **Route Optimization & Plan Lifecycle verified**: Multi-stop PDP with capacity constraints and pickup-preceding-drop precedence verified with OR-Tools and greedy fallback. Baseline comparison honestly models dedicated unconsolidated round trips per order. Concurrency revalidation enforces `409 STALE_PLAN` if order status changes before approval. On approval, atomic shipment & stop creation and `kg·km` share transport cost allocation are performed with order event audit logging. Zero regression across all Phase 1–8 tests. |
+| Source code | **Phase 10 complete** (Price Transparency Waterfall Engine + Per-Order Breakdown API `GET /pricing/breakdown` + Fair Benchmark Band API `GET /pricing/benchmark` + Traditional Chain Scenario Comparison + Provenance & Disclaimer Handlers + Frontend OrderPriceBreakdown & DemandPanel Integration) |
+| Current implementation phase | **Phase 10 complete — next: Phase 11** (Impact Analytics Dashboard) |
+| Tests executed | **129 backend tests passed** (`pytest -q`), **43 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
+| Measured metrics | **Price Transparency verified**: Authoritative mathematical reconciliation `landed = farmgate + transport + platform_fee` (±0.01) and totals `totals.landed_total = farmgate_total + transport_total + fee_total` verified across all orders. APMC reference benchmark properly distinguishes `AGMARKNET_SNAPSHOT` from `SYNTHETIC_DEMO`. Traditional scenario model correctly evaluates `farmer_mandi_net`, `buyer_traditional`, `delta_farmer_pct`, and `delta_buyer_pct` under disclosed assumptions with `basis:"MODELLED_SCENARIO"`. Fair price band `[L, U]` computed deterministically and hidden when inverted. Zero regression across Phase 1–9. |
 
 
 
