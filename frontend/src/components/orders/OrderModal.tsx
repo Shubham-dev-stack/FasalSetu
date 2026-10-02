@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
-import { Listing, Order } from '../../api/types';
+import React, { useEffect, useState } from 'react';
+import { Listing, LogisticsEstimateResponse, Order } from '../../api/types';
 import { createOrderApi } from '../../api/orders';
+import { fetchLogisticsEstimateApi } from '../../api/logistics';
+import { LogisticsEstimate } from '../domain/LogisticsEstimate';
 
 interface OrderModalProps {
   listing: Listing;
@@ -27,11 +29,35 @@ export const OrderModal: React.FC<OrderModalProps> = ({
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Live Logistics Estimate state
+  const [logisticsEst, setLogisticsEst] = useState<LogisticsEstimateResponse | null>(null);
+
+  useEffect(() => {
+    if (quantity >= minOrder && quantity <= maxAvailable) {
+      fetchLogisticsEstimateApi(
+        {
+          listing_id: listing.id,
+          quantity_kg: quantity,
+        },
+        token
+      )
+        .then((est) => {
+          setLogisticsEst(est);
+        })
+        .catch(() => {
+          // If profile coordinates are unavailable or error occurs, fallback to listing landed_estimate
+          setLogisticsEst(null);
+        });
+    } else {
+      setLogisticsEst(null);
+    }
+  }, [listing.id, quantity, minOrder, maxAvailable, token]);
+
   // Financial calculations
   const askPrice = Number(listing.ask_price_per_kg) || 0;
   const farmgateTotal = quantity * askPrice;
-  const transportPerKg = listing.landed_estimate?.transport_cost_per_kg || 0;
-  const transportTotal = quantity * transportPerKg;
+  const transportPerKg = logisticsEst ? logisticsEst.cost_per_kg : (listing.landed_estimate?.transport_cost_per_kg || 0);
+  const transportTotal = logisticsEst ? logisticsEst.cost_total : (quantity * transportPerKg);
   const platformFeePerKg = Math.round(askPrice * 0.02 * 100) / 100;
   const platformFeeTotal = quantity * platformFeePerKg;
   const landedTotal = farmgateTotal + transportTotal + platformFeeTotal;
@@ -142,6 +168,11 @@ export const OrderModal: React.FC<OrderModalProps> = ({
             </div>
           </div>
 
+          {/* Dedicated Logistics Estimate Component */}
+          {logisticsEst && (
+            <LogisticsEstimate estimate={logisticsEst} quantityKg={quantity} />
+          )}
+
           {/* Pricing Preview */}
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2 text-xs">
             <div className="flex justify-between text-gray-600">
@@ -150,7 +181,10 @@ export const OrderModal: React.FC<OrderModalProps> = ({
             </div>
             {transportPerKg > 0 && (
               <div className="flex justify-between text-gray-600">
-                <span>Est. Transport ({quantity} kg × ₹{transportPerKg.toFixed(2)}):</span>
+                <span>
+                  Est. Transport ({quantity} kg × ₹{transportPerKg.toFixed(2)})
+                  {logisticsEst && <span className="text-[10px] text-emerald-600 ml-1 font-semibold">(live calc)</span>}:
+                </span>
                 <span className="font-medium text-gray-900">₹{transportTotal.toFixed(2)}</span>
               </div>
             )}

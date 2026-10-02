@@ -117,15 +117,16 @@ Timeboxing rule: if a phase reaches 1.5× its estimate, stop and apply the cut l
 - **Risks:** scoring ties (deterministic tie-break); unit errors in landed price.
 - **Status:** **Complete**. 102 backend tests passing, 34 frontend tests passing, ruff passed, vite build passed. AC-MAT-01 through AC-MAT-08 fully verified.
 
-## 10. PHASE 8 — Logistics (1.0 h)
+## 10. PHASE 8 — Logistics (1.0 h) — COMPLETE
 
 - **Objective:** expose logistics estimate and fleet, show cost on UI.
 - **Dependencies:** Phase 1 utils, Phase 5.
 - **Deliverables:** `POST /logistics/estimate`, `GET /logistics/vehicles`; `NO_VEHICLE_AVAILABLE` handling; frontend: logistics estimate card on listing detail/market card and vehicles table on ops page.
-- **Files:** `modules/logistics/{router,service}.py`, `frontend/src/components/domain/LogisticsEstimate.tsx`.
-- **Acceptance:** AC-LOG-01…05.
+- **Files:** `modules/logistics/{router,fleet,cost}.py`, `schemas/logistics.py`, `frontend/src/components/domain/LogisticsEstimate.tsx`, `frontend/src/pages/ops/LogisticsOpsPage.tsx`.
+- **Acceptance:** AC-LOG-01…05 (All PASSED).
 - **Exit:** estimates consistent between marketplace, matching and endpoint (same function); tag `phase-08-done`.
 - **Risks:** duplicated formulas (Rules C-14).
+- **Status:** **Complete**. 112 backend tests passing, 38 frontend tests passing, ruff passed, vite build passed. AC-LOG-01 through AC-LOG-05 fully verified.
 
 ## 11. PHASE 9 — Route optimization (3.5 h)
 

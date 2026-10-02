@@ -16,6 +16,7 @@ import { MarketplacePage } from './pages/market/MarketplacePage';
 import { OrdersPage } from './pages/orders/OrdersPage';
 import { OrderDetailPage } from './pages/orders/OrderDetailPage';
 import { ForecastPage } from './pages/forecast/ForecastPage';
+import { LogisticsOpsPage } from './pages/ops/LogisticsOpsPage';
 
 const ProtectedLayout: React.FC<{ children: React.ReactNode; title?: string }> = ({
   children,
@@ -191,11 +192,7 @@ export default function App() {
             path="/ops/logistics"
             element={
               <ProtectedLayout title="Logistics & Fleet Dispatch">
-                <PlaceholderPage
-                  title="Logistics & Fleet Dispatch"
-                  phase="Phase 6 — Transport Optimization"
-                  description="Dispatch dedicated vehicles, evaluate empty-haul charges, and track regional transport."
-                />
+                <LogisticsOpsPage />
               </ProtectedLayout>
             }
           />

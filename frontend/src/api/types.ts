@@ -648,4 +648,51 @@ export interface ProducerOpportunitiesResponse {
   } | null;
 }
 
+export interface VehiclePlanLeg {
+  vehicle_type: string;
+  capacity_kg: number;
+  load_kg: number;
+  trips: number;
+  trip_cost: number;
+  total_cost: number;
+}
+
+export interface LogisticsEstimateRequest {
+  listing_id: number;
+  quantity_kg: number;
+  buyer_id?: number | null;
+  dest_lat?: number | null;
+  dest_lng?: number | null;
+}
+
+export interface LogisticsEstimateResponse {
+  distance_km: number;
+  distance_source: string;
+  vehicle_plan: VehiclePlanLeg[];
+  trips: number;
+  cost_total: number;
+  cost_per_kg: number;
+  transit_hours: number;
+  basis: string;
+}
+
+export interface FleetVehicle {
+  id: number;
+  name: string;
+  vehicle_type: string;
+  capacity_kg: number;
+  cost_per_km: number;
+  fixed_cost_per_trip: number;
+  avg_speed_kmph: number;
+  depot_name: string;
+  depot_lat: number;
+  depot_lng: number;
+  is_available: boolean;
+  is_demo: boolean;
+}
+
+export interface VehicleListResponse {
+  items: FleetVehicle[];
+}
+
 

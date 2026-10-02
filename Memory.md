@@ -18,10 +18,10 @@ Update rules: Execution.md §8. Never record results that were not produced by a
 | Item | State |
 |---|---|
 | Documentation package (14 files + AGENTS.md) | **Complete** (moved to `docs/` with README, Memory, AGENTS at root) |
-| Source code | **Phase 7 complete** (Deterministic Matching Engine & Multi-Source Allocation + F1–F6 Hard Filtering + Candidate Scoring + Greedy Allocation + Near-Miss Diagnostics + Atomic PLACED Order Acceptance + 409 STALE_ALLOCATION + Producer Reverse Opportunities + MatchPage UI + Opportunities Modal) |
-| Current implementation phase | **Phase 7 complete — next: Phase 8** (Logistics Cost Calculator & Fleet APIs) |
-| Tests executed | **102 backend tests passed** (`pytest -q`), **34 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
-| Measured metrics | **Deterministic Matching Engine verified**: Scoring is pure & stateless, bounded $[0.0, 1.0]$. Hard filters F1–F6 enforced. Deterministic tie-breaking on `(-total_score, landed_price, listing_id)`. Multi-source greedy allocation satisfies below-min-order constraints and max 5 near-misses. Acceptance is atomic and concurrency-safe via conditional quantity updates, recording `OrderEvent` and recalculating requirement fulfillment. R3 partial (300 kg / 1,000 kg from L10) and R8 shortfall (1,500 kg shortfall, L13 budget near-miss) verified on seed state. |
+| Source code | **Phase 8 complete** (Dedicated Logistics Trip Cost Calculator + Multi-Trip Vehicle Sizing + Fleet Inventory Endpoints + `POST /logistics/estimate` + `GET /logistics/vehicles` + `NO_VEHICLE_AVAILABLE` 409 + Frontend LogisticsOpsPage & Live LogisticsEstimate Component) |
+| Current implementation phase | **Phase 8 complete — next: Phase 9** (OR-Tools Route Optimization & Multi-Stop Delivery Plans) |
+| Tests executed | **112 backend tests passed** (`pytest -q`), **38 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
+| Measured metrics | **Logistics & Fleet APIs verified**: Dedicated round-trip logistics calculation strictly implements `fixed_cost + cost_per_km * distance_km * return_factor(2.0)`, cost-per-kg, and speed/service-stop transit hours. Oversize loads (>4,000 kg) correctly allocate largest types + remainder fit. 409 `NO_VEHICLE_AVAILABLE` enforced when active fleet is empty. Fleet inventory endpoint `GET /logistics/vehicles` returns 5 seeded vehicles. Zero regression across all Phase 1–7 tests. |
 
 
 
@@ -100,8 +100,9 @@ Completed:
 - Phase 5: Unified Marketplace + Discovery: `POST /orders`, `GET /orders`, `GET /orders/{id}`, `POST /orders/{id}/transition`, atomic conditional reservation on Listing, concurrency-safe requirement fulfillment, financial snapshotting (farmgate, dedicated transport, 2% platform fee), deterministic seed orders O1–O6 (`CONFIRMED`, unrouted) and H1–H4 (`DELIVERED`, historical), frontend `MarketplacePage`, `OrderModal`, `OrdersPage`, and `OrderDetailPage`.
 - Phase 6: Demand Forecasting ML Pipeline: LightGBM quantile regression models, causal forward-fill imputation, Train+Val refit, validation honesty gate, fallback mechanism, TTL caching, `GET /forecasts/demand`, `GET /forecasts/hubs`, `GET /forecasts/model-info`, frontend forecast charts, hub supply-demand ranking, demand panel on listing creation.
 - Phase 7: Smart Matching & Allocation: Deterministic F1–F6 hard filters, multi-factor scoring (price 0.40, distance 0.20, freshness 0.20, fill 0.20), tie-breaking (-score, price, id), greedy multi-source allocation with below-min-order handling, max 5 near-miss diagnostics, atomic conditional `Listing` quantity updates on acceptance creating `PLACED` orders and `OrderEvent` records with requirement fulfillment recalculation, 409 `STALE_ALLOCATION` concurrency guard, reverse producer opportunities with hub demand context, frontend `/buyer/requirements/:id/match` MatchPage with interactive allocation/cards/accordion/delivery-date and `[Buyer Matches]` modal on producer listings.
+- Phase 8: Logistics Cost Calculator & Fleet APIs: Dedicated single-trip logistics estimation (`POST /logistics/estimate`), vehicle sizing per ML.md §11 (smallest fitting type if $\le 4,000$ kg; multiple trips of largest type + remainder fit if $> 4,000$ kg), transit hours estimation, `409 NO_VEHICLE_AVAILABLE` guard, public fleet inventory endpoint (`GET /logistics/vehicles`), frontend `LogisticsOpsPage` at `/ops/logistics`, `LogisticsEstimate` component, and live transport cost calculation in direct `OrderModal`.
 
-Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 8 through 13).
+Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 9 through 13).
 
 ## 12. Future work
 
@@ -109,7 +110,7 @@ PRD §18. Highlights: real demand data, Agmarknet/eNAM feeds, payments, individu
 
 ## 13. Next action
 
-1. Proceed to **Phase 8** (Phases.md §10): Logistics Cost Calculator & Fleet APIs (`POST /logistics/estimate`, `GET /logistics/vehicles`, `NO_VEHICLE_AVAILABLE` handling, frontend logistics estimate cards and fleet tables).
+1. Proceed to **Phase 9** (Phases.md §11): Route Optimization (`POST /routes/optimize`, `GET /routes/plans`, `POST /routes/plans/{id}/approve`, `POST /routes/plans/{id}/discard`, OR-Tools multi-stop capacitated VRP solver with greedy fallback, route maps and plan management UI).
 
 
 

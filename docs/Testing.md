@@ -214,6 +214,14 @@ All MUST ACs executed; any failure either fixed or recorded in Memory.md "Known 
 | 2026-10-01 | `ruff check .` (backend linter - Phase 6) | `All checks passed!` | Zero lint or formatting errors across all backend code and test files |
 | 2026-10-01 | `npm test -- --run` (frontend vitest - Phase 6) | `Test Files: 5 passed (5), Tests: 27 passed (27), Duration: 12.89s` | AC-FC-01..07 client domain rules, horizon validation, interval monotonicity, Rule D-026 supply attribution, fallback null intervals verified |
 | 2026-10-01 | `npm run build` (frontend bundle - Phase 6) | `✓ 2320 modules transformed. dist/assets/index-DpqPDomn.js 743.07 kB (gzip: 199.97 kB). ✓ built in 18.02s` | Zero TypeScript or Vite compilation errors across ForecastPage, ForecastChart, DemandPanel, ModelInfoModal |
+| 2026-10-02 | `pytest -q` (backend suite - Phase 7) | `102 passed, 499 warnings in 23.39s` | AC-MAT-01..08 passed; Deterministic scoring bounded [0,1], hard filters F1-F6, tie-breaking (-score, price, id), R3 partial fill, R8 budget shortfall, R2 multi-source greedy allocation, atomic acceptance, STALE_ALLOCATION 409 guard, producer opportunities |
+| 2026-10-02 | `ruff check .` (backend linter - Phase 7) | `All checks passed!` | Zero lint or formatting errors across Phase 7 matching code |
+| 2026-10-02 | `npm test` (frontend vitest - Phase 7) | `Test Files: 6 passed (6), Tests: 34 passed (34), Duration: 1.60s` | Candidate card rendering, score breakdowns, near-miss summaries, shortfall alerts, below-min-order handling, and opportunities modal tested |
+| 2026-10-02 | `npm run build` (frontend bundle - Phase 7) | `✓ 2325 modules transformed. dist/assets/index-CUhtSgvq.js 770.67 kB (gzip: 205.51 kB). ✓ built in 9.39s` | Clean compilation across MatchPage, CandidateCard, ScoreBreakdown, ProducerOpportunitiesModal |
+| 2026-10-02 | `pytest -q` (backend suite - Phase 8) | `112 passed, 501 warnings in 22.42s` | AC-LOG-01..05 passed; Dedicated trip estimate calculation (fixed + rate*dist*2), multi-trip vehicle allocation, cost-per-kg, transit hours, 409 NO_VEHICLE_AVAILABLE handling, fleet vehicle inventory endpoint GET /logistics/vehicles |
+| 2026-10-02 | `ruff check .` (backend linter - Phase 8) | `All checks passed!` | Zero lint or formatting errors across all backend modules |
+| 2026-10-02 | `npm test` (frontend vitest - Phase 8) | `Test Files: 7 passed (7), Tests: 38 passed (38), Duration: 1.60s` | Fleet vehicle list, vehicle type formatting, dedicated logistics estimate response mapping, and multi-trip oversize load cost aggregation verified |
+| 2026-10-02 | `npm run build` (frontend bundle - Phase 8) | `✓ 2328 modules transformed. dist/assets/index-CAkFsW6C.js 780.08 kB (gzip: 207.38 kB). ✓ built in 9.39s` | Clean production build across LogisticsOpsPage, LogisticsEstimate presentation component, and OrderModal live estimate integration |
 
 
 

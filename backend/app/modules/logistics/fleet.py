@@ -5,8 +5,10 @@ from sqlalchemy.orm import Session
 from app.db.models import Vehicle
 
 
-def get_vehicle_types(db: Session) -> list[dict[str, Any]]:
-    """Load available vehicle types from DB, falling back to config defaults."""
+def get_vehicle_types(
+    db: Session, require_active: bool = False
+) -> list[dict[str, Any]]:
+    """Load available vehicle types from DB, falling back to config defaults unless require_active is True."""
     vehicles = db.query(Vehicle).filter(Vehicle.is_available.is_(True)).all()
     if vehicles:
         seen = set()
@@ -23,6 +25,9 @@ def get_vehicle_types(db: Session) -> list[dict[str, Any]]:
                     }
                 )
         return v_types
+
+    if require_active:
+        return []
 
     # Fallback default types per config/logistics.yaml
     return [
