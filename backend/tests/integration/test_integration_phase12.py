@@ -317,7 +317,7 @@ def test_concurrent_order_reservation_no_oversell():
 
     Create a listing with 500 kg available.
     Spawn 5 concurrent threads each trying to buy 200 kg.
-    Verify: exactly 2 succeed (400 kg reserved), 3 fail with insufficient quantity (422),
+    Verify: exactly 2 succeed (400 kg reserved), 3 fail with insufficient quantity (409 Conflict),
     and available quantity remains exactly 100 kg with zero oversell.
     """
     from concurrent.futures import ThreadPoolExecutor
@@ -364,10 +364,12 @@ def test_concurrent_order_reservation_no_oversell():
         results = [f.result() for f in futures]
 
     successes = [r for r in results if r.status_code == 201]
-    failures = [r for r in results if r.status_code in (409, 422)]
+    failures = [r for r in results if r.status_code == 409]
 
     assert len(successes) == 2, f"Expected exactly 2 successes, got {len(successes)}"
     assert len(failures) == 3, f"Expected 3 failures, got {len(failures)}"
+    for f in failures:
+        assert f.json()["error"]["code"] == "INSUFFICIENT_QUANTITY"
 
     # 3. Check final listing quantity: exactly 100 kg remains
     check_res = client.get(f"/api/v1/listings/{listing_id}", headers=auth_header(buyer_token))
