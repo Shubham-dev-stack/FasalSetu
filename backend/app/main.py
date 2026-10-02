@@ -5,6 +5,7 @@ from sqlalchemy import text
 from app.core.config import get_settings
 from app.core.database import SessionLocal
 from app.core.errors import register_error_handlers
+from app.modules.analytics.router import router as analytics_router
 from app.modules.auth.router import router as auth_router
 from app.modules.forecasting.router import router as forecasting_router
 from app.modules.listings.router import router as listings_router
@@ -84,6 +85,7 @@ def create_app() -> FastAPI:
     app.include_router(logistics_router, prefix="/api/v1")
     app.include_router(routes_router, prefix="/api/v1")
     app.include_router(pricing_router, prefix="/api/v1")
+    app.include_router(analytics_router, prefix="/api/v1")
 
     return app
 
