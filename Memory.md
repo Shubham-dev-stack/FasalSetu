@@ -18,10 +18,10 @@ Update rules: Execution.md §8. Never record results that were not produced by a
 | Item | State |
 |---|---|
 | Documentation package (14 files + AGENTS.md) | **Complete** (moved to `docs/` with README, Memory, AGENTS at root) |
-| Source code | **Phase 10 complete** (Price Transparency Waterfall Engine + Per-Order Breakdown API `GET /pricing/breakdown` + Fair Benchmark Band API `GET /pricing/benchmark` + Traditional Chain Scenario Comparison + Provenance & Disclaimer Handlers + Frontend OrderPriceBreakdown & DemandPanel Integration) |
-| Current implementation phase | **Phase 10 complete — next: Phase 11** (Impact Analytics Dashboard) |
-| Tests executed | **129 backend tests passed** (`pytest -q`), **43 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
-| Measured metrics | **Price Transparency verified**: Authoritative mathematical reconciliation `landed = farmgate + transport + platform_fee` (±0.01) and totals `totals.landed_total = farmgate_total + transport_total + fee_total` verified across all orders. APMC reference benchmark properly distinguishes `AGMARKNET_SNAPSHOT` from `SYNTHETIC_DEMO`. Traditional scenario model correctly evaluates `farmer_mandi_net`, `buyer_traditional`, `delta_farmer_pct`, and `delta_buyer_pct` under disclosed assumptions with `basis:"MODELLED_SCENARIO"`. Fair price band `[L, U]` computed deterministically and hidden when inverted. Zero regression across Phase 1–9. |
+| Source code | **Phase 11 complete** (Platform Impact Analytics Dashboard + Overview API `GET /analytics/overview` with committed KPIs, 14-day orders series, modelled price gap + Hub x Crop Supply-Demand Matrix API `GET /analytics/supply-demand` with Rule D-026 single-hub attribution and status chips + Full Provenance & Disclaimer Handlers + Frontend AnalyticsPage Integration) |
+| Current implementation phase | **Phase 11 complete — next: Phase 12** (Integration, Reset & Demo Script End-to-End) |
+| Tests executed | **136 backend tests passed** (`pytest -q`), **45 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
+| Measured metrics | **Impact Analytics verified**: Platform KPIs independently reconciled with underlying committed orders (volume 6,350 kg, farmgate value ₹140,100), requirement fill rate 8.05%, transport cost ₹8.54/kg. Modelled price gap evaluated against traditional APMC chain scenario with transparent assumptions. Approved route plan savings dynamically reflected in KPIs. Hub x crop matrix correctly maps 25 pairs with single-hub produce attribution (no double-counting). AC-ANL-01..03 passed. Zero regression across Phase 1–10. |
 
 
 
@@ -104,8 +104,9 @@ Completed:
 
 - Phase 9: Route Optimization: OR-Tools capacitated pickup-and-delivery VRP solver (`optimize_routes`), greedy fallback, multi-stop pickup and delivery grouping, `route_plans` proposal and lifecycle management (`POST /routes/optimize`, `GET /routes/plans`, `POST /routes/plans/{id}/approve`, `POST /routes/plans/{id}/discard`), atomic order state updates to `ROUTED`, shipment creation, stale plan concurrency guard (409), logistics savings against modelled direct baseline, frontend `RouteOptimization` and `RouteMap` components.
 - Phase 10: Price Transparency: Authoritative per-order waterfall arithmetic (`GET /pricing/breakdown`), baseline/reference APMC modal price and trend lookup (`GET /pricing/benchmark`), research-backed traditional multi-tier scenario comparison (`compute_traditional_scenario`), deterministic fair price band (`[L, U]`), provenance and disclaimer compliance (`AGMARKNET_SNAPSHOT` vs `SYNTHETIC_DEMO`, `basis: "MODELLED_SCENARIO"`), and frontend `OrderPriceBreakdown` and `DemandPanel` integration.
+- Phase 11: Impact Analytics Dashboard: Platform KPI overview (`GET /analytics/overview`) aggregating committed orders, transacted produce volume/value, requirement fill rate, transport costs, and approved route plan savings; 14-day daily orders/volume timeline; modelled price scenario comparisons; Hub x Crop supply-vs-demand gap matrix (`GET /analytics/supply-demand`) with Rule D-026 single-hub produce attribution (no double-counting) and status chips; full frontend `AnalyticsPage` dashboard integration.
 
-Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 11 through 13).
+Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phases 12 and 13).
 
 ## 12. Future work
 
@@ -113,7 +114,7 @@ PRD §18. Highlights: real demand data, Agmarknet/eNAM feeds, payments, individu
 
 ## 13. Next action
 
-1. Proceed to **Phase 11** (Phases.md §13): Impact Analytics Dashboard (`GET /analytics/summary`, `GET /analytics/farmer-impact`, `GET /analytics/buyer-impact`, `GET /analytics/logistics-impact`, frontend `AnalyticsPage` with summary metric cards, distribution charts, and methodology/disclaimer drawers).
+1. Proceed to **Phase 12** (Phases.md §14): Integration & Full Demo Path (`POST /system/reset-demo`, persona switcher in top bar, deep links between screens, consistent formatting helpers, Dockerfile and static mount, full Demo.md script verification).
 
 
 

@@ -221,7 +221,14 @@ All MUST ACs executed; any failure either fixed or recorded in Memory.md "Known 
 | 2026-10-02 | `pytest -q` (backend suite - Phase 8) | `112 passed, 501 warnings in 22.42s` | AC-LOG-01..05 passed; Dedicated trip estimate calculation (fixed + rate*dist*2), multi-trip vehicle allocation, cost-per-kg, transit hours, 409 NO_VEHICLE_AVAILABLE handling, fleet vehicle inventory endpoint GET /logistics/vehicles |
 | 2026-10-02 | `ruff check .` (backend linter - Phase 8) | `All checks passed!` | Zero lint or formatting errors across all backend modules |
 | 2026-10-02 | `npm test` (frontend vitest - Phase 8) | `Test Files: 7 passed (7), Tests: 38 passed (38), Duration: 1.60s` | Fleet vehicle list, vehicle type formatting, dedicated logistics estimate response mapping, and multi-trip oversize load cost aggregation verified |
-| 2026-10-02 | `npm run build` (frontend bundle - Phase 8) | `✓ 2328 modules transformed. dist/assets/index-CAkFsW6C.js 780.08 kB (gzip: 207.38 kB). ✓ built in 9.39s` | Clean production build across LogisticsOpsPage, LogisticsEstimate presentation component, and OrderModal live estimate integration |
+| 2026-10-02 | `pytest -q` (backend suite - Phase 10) | `129 passed, 503 warnings in 24.12s` | AC-PRC-01..04 passed; Per-order price waterfall breakdown (farmgate + transport + platform fee = landed ±0.01), APMC reference benchmark with provenance distinction, traditional multi-tier scenario modeling with disclosed assumptions, and deterministic fair price band verified |
+| 2026-10-02 | `ruff check .` (backend linter - Phase 10) | `All checks passed!` | Zero lint or formatting errors across pricing module and tests |
+| 2026-10-02 | `npm test` (frontend vitest - Phase 10) | `Test Files: 9 passed (9), Tests: 43 passed (43), Duration: 1.82s` | Waterfall price reconciliation, scenario formulas, and fair price band mapping verified |
+| 2026-10-02 | `npm run build` (frontend bundle - Phase 10) | `✓ 2330 modules transformed. dist/assets/index.js 785.42 kB. ✓ built in 25.43s` | Clean compilation across OrderPriceBreakdown and DemandPanel price transparency components |
+| 2026-10-02 | `pytest -q` (backend suite - Phase 11) | `136 passed, 889 warnings in 66.36s` | AC-ANL-01..03 passed; Platform KPI overview aggregation (committed volume, value, fill rate, logistics cost/kg, route savings, fleet utilization), empty-db null/zero handling, 14-day timeline series, and Hub x Crop supply-demand matrix with Rule D-026 single-hub attribution and status chips verified |
+| 2026-10-02 | `ruff check .` (backend linter - Phase 11) | `All checks passed!` | Zero lint or formatting errors across analytics module, schemas, and tests |
+| 2026-10-02 | `npm test -- --run` (frontend vitest - Phase 11) | `Test Files: 10 passed (10), Tests: 45 passed (45), Duration: 1.90s` | Analytics overview types, KPI formatting, supply-demand ratio thresholds (SHORTAGE < 0.7, SURPLUS > 1.3), and API mapping verified |
+| 2026-10-02 | `npm run build` (frontend bundle - Phase 11) | `✓ 2332 modules transformed. dist/assets/index-BV0k4H5x.js 823.69 kB. ✓ built in 10.00s` | Clean production build of full SPA including AnalyticsPage dashboard |
 
 
 

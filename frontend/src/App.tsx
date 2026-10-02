@@ -4,7 +4,6 @@ import { AuthProvider, useAuth } from './lib/auth';
 import { LoginPage } from './pages/login/LoginPage';
 import { AppShell } from './components/layout/AppShell';
 import { DashboardPage } from './pages/dashboard/DashboardPage';
-import { PlaceholderPage } from './pages/placeholder/PlaceholderPage';
 import { ListingsPage } from './pages/producer/ListingsPage';
 import { NewListingPage } from './pages/producer/NewListingPage';
 import { ProducerProfilePage } from './pages/producer/ProducerProfilePage';
@@ -18,6 +17,7 @@ import { OrderDetailPage } from './pages/orders/OrderDetailPage';
 import { ForecastPage } from './pages/forecast/ForecastPage';
 import { LogisticsOpsPage } from './pages/ops/LogisticsOpsPage';
 import { RoutePlanPage } from './pages/ops/RoutePlanPage';
+import { AnalyticsPage } from './pages/analytics/AnalyticsPage';
 
 const ProtectedLayout: React.FC<{ children: React.ReactNode; title?: string }> = ({
   children,
@@ -211,11 +211,7 @@ export default function App() {
             path="/analytics"
             element={
               <ProtectedLayout title="Impact Analytics">
-                <PlaceholderPage
-                  title="Impact Analytics"
-                  phase="Phase 9 — Impact Analytics"
-                  description="Track farmer net price realizations vs APMC benchmarks and platform waste reduction."
-                />
+                <AnalyticsPage />
               </ProtectedLayout>
             }
           />

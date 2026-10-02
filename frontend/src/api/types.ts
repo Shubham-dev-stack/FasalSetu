@@ -892,6 +892,64 @@ export interface PricingBenchmarkResponse {
   disclaimer: string;
 }
 
+export interface AnalyticsKPIs {
+  committed_orders: number;
+  committed_volume_kg: number;
+  committed_value_inr: number;
+  requirement_fill_rate_pct?: number | null;
+  avg_logistics_cost_per_kg?: number | null;
+  route_savings_km: number;
+  route_savings_inr: number;
+  avg_utilization_pct?: number | null;
+}
+
+export interface AnalyticsPriceGap {
+  avg_farmer_delta_pct?: number | null;
+  avg_buyer_delta_pct?: number | null;
+  orders_considered: number;
+  basis: string;
+}
+
+export interface DailyOrdersPoint {
+  date: string;
+  orders: number;
+  volume_kg: number;
+}
+
+export interface AnalyticsModelContext {
+  deployed_method: string;
+  data_source: string;
+  model_version?: string | null;
+}
+
+export interface AnalyticsOverviewResponse {
+  as_of: string;
+  data_note: string;
+  kpis: AnalyticsKPIs;
+  price_gap: AnalyticsPriceGap;
+  daily: DailyOrdersPoint[];
+  model: AnalyticsModelContext;
+}
+
+export interface SupplyDemandRow {
+  hub: string;
+  hub_id: number;
+  crop: string;
+  crop_id: number;
+  forecast_7d_kg: number;
+  supply_kg: number;
+  ratio: number;
+  status: 'SHORTAGE' | 'SURPLUS' | 'BALANCED' | string;
+}
+
+export interface AnalyticsSupplyDemandResponse {
+  rows: SupplyDemandRow[];
+  method: string;
+  data_source: string;
+  as_of: string;
+}
+
+
 
 
 
