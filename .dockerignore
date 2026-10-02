@@ -16,3 +16,7 @@ htmlcov
 *.swp
 *.sqlite3
 *.db
+.env
+.env.*
+**/.env
+**/.env.*

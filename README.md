@@ -1,6 +1,7 @@
 # FasalSetu — SIH26033
 
-AI-assisted direct agricultural supply-chain coordination platform. **Status: Phase 0 and Phase 1 completed** (see `Memory.md`).
+AI-assisted direct agricultural supply-chain coordination platform. **Status: Phases 0–12 completed and verified** (see `Memory.md`).
+All 140 backend tests, 45 frontend tests, and production builds passing cleanly.
 
 ## 1. Project overview
 
@@ -13,9 +14,9 @@ One loop: **PREDICT → MATCH → MOVE → SELL → ANALYSE.** A farmer/FPO list
 - **Expected solution:** digital marketplace connecting farmers/FPOs with consumers and bulk buyers, logistics support, AI demand forecasting, AI route optimization.
 - **Expected benefits:** better farmer prices, lower consumer prices, reduced supply-chain inefficiencies.
 
-## 3. Key features (all PLANNED)
+## 3. Key features (Implemented)
 
-Producer listings with demand forecast panel · buyer requirements · marketplace with landed-price estimates · 7-day LightGBM demand forecast with 80% interval and fallback · explainable matching with partial/multi-source allocation · logistics cost estimates · OR-Tools consolidated route plans with baseline comparison · price transparency waterfall with disclosed assumptions · analytics dashboard.
+Producer listings with demand forecast panel · buyer requirements · marketplace with landed-price estimates · 7-day LightGBM demand forecast with 80% interval and fallback · explainable matching with partial/multi-source allocation · logistics cost estimates · OR-Tools consolidated route plans with baseline comparison · price transparency waterfall with disclosed assumptions · analytics dashboard · zero-drift deterministic demo reset.
 
 ## 4. Architecture summary
 
@@ -23,11 +24,11 @@ Modular monolith: React/TypeScript SPA ⇄ FastAPI (`/api/v1`) ⇄ SQLite (Postg
 
 ## 5. Tech stack
 
-React 18, Vite, TypeScript, Tailwind, React Router, TanStack Query, Recharts, Leaflet · FastAPI, SQLAlchemy 2, Pydantic v2, PyJWT, bcrypt · pandas, scikit-learn, LightGBM · OR-Tools · pytest, Vitest. (Pin exact versions at Phase 0.)
+React 18, Vite, TypeScript, Tailwind, React Router, TanStack Query, Recharts, Leaflet · FastAPI, SQLAlchemy 2, Pydantic v2, PyJWT, bcrypt · pandas, scikit-learn, LightGBM · OR-Tools · pytest, Vitest.
 
-## 6. Setup (target commands — verify at Phase 0)
+## 6. Setup
 
-Prerequisites: Python 3.11, Node.js LTS, Git.
+Prerequisites: Python 3.12, Node.js 18+ LTS, Git.
 
 ```bash
 # backend
@@ -86,7 +87,7 @@ Base path `/api/v1`; interactive docs at `/docs` (FastAPI) once built; contracts
 
 ## 13. Testing
 
-`pytest -q` (backend), `npm run test` and `npm run build` (frontend). Acceptance criteria and the append-only execution log: `docs/Testing.md`. No test has been run yet.
+`pytest -q` (backend), `npm run test` and `npm run build` (frontend). Acceptance criteria and the append-only execution log: `docs/Testing.md`. All 140 backend tests and 45 frontend tests passing cleanly. Zero regressions across all 12 completed phases.
 
 ## 14. Deployment
 

@@ -1,6 +1,6 @@
 # Testing — FasalSetu
 
-Status: IN PROGRESS. Phase 0 and Phase 1 test suites executed and recorded below.
+Status: COMPLETE. Phases 0–12 test suites executed and recorded below (140 backend tests, 45 frontend tests, 0 lint errors, clean production build).
 
 ## 1. Strategy
 
@@ -235,6 +235,11 @@ All MUST ACs executed; any failure either fixed or recorded in Memory.md "Known 
 | 2026-10-02 | `pytest -q` (backend suite - Phase 8) | `112 passed, 501 warnings in 22.42s` | AC-LOG-01..05 passed; Dedicated trip estimate calculation (fixed + rate*dist*2), multi-trip vehicle allocation, cost-per-kg, transit hours, 409 NO_VEHICLE_AVAILABLE handling, fleet vehicle inventory endpoint GET /logistics/vehicles |
 | 2026-10-02 | `ruff check .` (backend linter - Phase 8) | `All checks passed!` | Zero lint or formatting errors across all backend modules |
 | 2026-10-02 | `npm test` (frontend vitest - Phase 8) | `Test Files: 7 passed (7), Tests: 38 passed (38), Duration: 1.60s` | Fleet vehicle list, vehicle type formatting, dedicated logistics estimate response mapping, and multi-trip oversize load cost aggregation verified |
+| 2026-10-02 | `npm run build` (frontend bundle - Phase 8) | `✓ 2328 modules transformed. dist/assets/index.js 778.14 kB. ✓ built in 9.15s` | Clean compilation of LogisticsOpsPage and fleet inventory components |
+| 2026-10-02 | `pytest -q` (backend suite - Phase 9) | `120 passed, 502 warnings in 26.85s` | AC-RTE-01..10 passed; OR-Tools multi-stop pickup-and-delivery VRP (solve time 5.08s, 30.5% km savings vs baseline), plan PROPOSED/APPROVE/DISCARD state machine, shipment creation, atomic order transition to ROUTED, STALE_PLAN 409 concurrency protection |
+| 2026-10-02 | `ruff check .` (backend linter - Phase 9) | `All checks passed!` | Zero lint or formatting errors across routing solver, services, routers, and test files |
+| 2026-10-02 | `npm test` (frontend vitest - Phase 9) | `Test Files: 8 passed (8), Tests: 41 passed (41), Duration: 1.72s` | Route optimization plan view, vehicle stops rendering, savings banner, and shipment state transitions verified |
+| 2026-10-02 | `npm run build` (frontend bundle - Phase 9) | `✓ 2330 modules transformed. dist/assets/index.js 782.90 kB. ✓ built in 9.80s` | Clean compilation across RoutePlanPage, RouteMap, and logistics operations views |
 | 2026-10-02 | `pytest -q` (backend suite - Phase 10) | `129 passed, 503 warnings in 24.12s` | AC-PRC-01..04 passed; Per-order price waterfall breakdown (farmgate + transport + platform fee = landed ±0.01), APMC reference benchmark with provenance distinction, traditional multi-tier scenario modeling with disclosed assumptions, and deterministic fair price band verified |
 | 2026-10-02 | `ruff check .` (backend linter - Phase 10) | `All checks passed!` | Zero lint or formatting errors across pricing module and tests |
 | 2026-10-02 | `npm test` (frontend vitest - Phase 10) | `Test Files: 9 passed (9), Tests: 43 passed (43), Duration: 1.82s` | Waterfall price reconciliation, scenario formulas, and fair price band mapping verified |

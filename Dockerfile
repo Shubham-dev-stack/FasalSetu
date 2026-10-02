@@ -30,11 +30,11 @@ COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 ENV PYTHONPATH=/app/backend \
     STATIC_DIR=/app/frontend/dist \
-    DEMO_MODE=true \
+    DEMO_MODE=false \
     PORT=8000
 
 WORKDIR /app/backend
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python -m scripts.setup_demo --no-retrain && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "if [ \"$DEMO_MODE\" = \"true\" ] && [ ! -f /app/backend/data/app.db ]; then python -m scripts.setup_demo --no-retrain; fi && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

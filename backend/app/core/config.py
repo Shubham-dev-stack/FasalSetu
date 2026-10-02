@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -31,6 +32,15 @@ class Settings(BaseSettings):
         return [
             origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()
         ]
+
+    @model_validator(mode="after")
+    def validate_production_settings(self) -> "Settings":
+        if self.APP_ENV == "production":
+            if "change-in-production" in self.SECRET_KEY or len(self.SECRET_KEY) < 32:
+                raise ValueError(
+                    "SECRET_KEY must be a cryptographically secure string (minimum 32 characters) in production."
+                )
+        return self
 
 
 @lru_cache

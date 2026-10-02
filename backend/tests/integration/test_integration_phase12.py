@@ -310,3 +310,67 @@ def test_object_level_security_regression():
     o_res = client.get("/api/v1/orders/1", headers=auth_header(buyer_gurugram_token))
     assert o_res.status_code == 403
     assert o_res.json()["error"]["code"] == "FORBIDDEN"
+
+
+def test_concurrent_order_reservation_no_oversell():
+    """Verify AC-ORD-04 under real multi-threaded concurrency contention.
+
+    Create a listing with 500 kg available.
+    Spawn 5 concurrent threads each trying to buy 200 kg.
+    Verify: exactly 2 succeed (400 kg reserved), 3 fail with insufficient quantity (422),
+    and available quantity remains exactly 100 kg with zero oversell.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    app = create_app()
+    client = TestClient(app)
+    fpo_token = get_token(client, "fpo_sonipat")
+    buyer_token = get_token(client, "buyer_gurugram")
+    today = today_ist()
+
+    # 1. Create a fresh listing with 500 kg
+    lst_res = client.post(
+        "/api/v1/listings",
+        headers=auth_header(fpo_token),
+        json={
+            "crop_id": 1,
+            "grade": "A",
+            "quantity_kg": 500.0,
+            "ask_price_per_kg": 25.0,
+            "min_order_kg": 50.0,
+            "harvest_date": today.isoformat(),
+            "available_from": today.isoformat(),
+            "available_until": (today + timedelta(days=3)).isoformat(),
+        },
+    )
+    assert lst_res.status_code == 201
+    listing_id = lst_res.json()["listing"]["id"]
+
+    # 2. Concurrently attempt 5 orders of 200 kg each
+    def place_order(_i):
+        c = TestClient(app)
+        return c.post(
+            "/api/v1/orders",
+            headers=auth_header(buyer_token),
+            json={
+                "listing_id": listing_id,
+                "quantity_kg": 200.0,
+                "delivery_date": today.isoformat(),
+            },
+        )
+
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = [executor.submit(place_order, i) for i in range(5)]
+        results = [f.result() for f in futures]
+
+    successes = [r for r in results if r.status_code == 201]
+    failures = [r for r in results if r.status_code in (409, 422)]
+
+    assert len(successes) == 2, f"Expected exactly 2 successes, got {len(successes)}"
+    assert len(failures) == 3, f"Expected 3 failures, got {len(failures)}"
+
+    # 3. Check final listing quantity: exactly 100 kg remains
+    check_res = client.get(f"/api/v1/listings/{listing_id}", headers=auth_header(buyer_token))
+    assert check_res.status_code == 200
+    assert check_res.json()["listing"]["quantity_available_kg"] == 100.0
+

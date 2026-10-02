@@ -1,6 +1,6 @@
 # Memory.md — FasalSetu permanent project state
 
-Update rules: Execution.md §8. Never record results that were not produced by an executed command. Last updated: 2026-10-01 (Phase 3 completion).
+Update rules: Execution.md §8. Never record results that were not produced by an executed command. Last updated: 2026-10-02 (Phase 12 completion).
 
 ## 1. Project identity
 
@@ -21,7 +21,7 @@ Update rules: Execution.md §8. Never record results that were not produced by a
 | Source code | **Phase 12 complete** (End-to-End Integration, Reset & Demo Verification + `POST /system/reset-demo` & `/api/v1/system/reset-demo` with full table drop/recreate, forecast cache purge, deterministic reseeding + Multi-stage Dockerfile & single-image SPA static mount D-008 + Navbar operator demo reset trigger + Comprehensive integration test suite `test_integration_phase12.py` + NFR spot checks and Demo.md §11 verification log completed) |
 | Current implementation phase | **Phase 12 complete — next: Phase 13** (Testing + Polish + Demo Readiness freeze) |
 | Tests executed | **140 backend tests passed** (`pytest -q`), **45 frontend tests passed** (`vitest`), **0 lint errors** (`ruff check .`), **0 build errors** (`npm run build`) |
-| Measured metrics | **Zero-drift idempotency verified**: Full Demo.md §4 path (PREDICT → MATCH → MOVE → SELL → ANALYSE) executed twice sequentially from fresh resets with identical results. R1 Tomato candidates move from 0 to rank-1 single-source full fill (1,500 kg @ ₹25.53 landed). Route plan optimized 909.1 km vs 1,307.3 km baseline (30.5% km savings, 14.7% cost savings, solve time 5.08s). Waterfall reconciles ₹23.00 + ₹3.52 + ₹0.46 = ₹26.98. NFR latencies: health p95=7.64ms, reference p95=9.02ms, listings p95=20.02ms, forecast demand p95=9.91ms (<300ms target), matching candidates p95=15.95ms, analytics p95=43.23ms. All NFR targets satisfied. |
+| Measured metrics | **Zero-drift idempotency verified**: Full Demo.md §4 path (PREDICT → MATCH → MOVE → SELL → ANALYSE) executed twice sequentially from fresh resets with identical results. R1 Tomato candidates move from 0 to rank-1 single-source full fill (1,500 kg @ ₹25.53 landed estimate: ₹23.00 ask + ₹2.07 transport estimate + ₹0.46 fee). Route plan optimized 909.1 km vs 1,307.3 km baseline (30.5% km savings, 14.7% cost savings, solve time 5.08s). Routed/delivered order waterfall reconciles ₹23.00 + ₹3.52 allocated transport + ₹0.46 fee = ₹26.98. NFR latencies: health p95=7.64ms, reference p95=9.02ms, listings p95=20.02ms, forecast demand p95=9.91ms (<300ms target), matching candidates p95=15.95ms, analytics p95=43.23ms. All NFR targets satisfied. |
 
 
 
@@ -81,13 +81,17 @@ A-01…A-12. Key ones: no public buyer-level demand data (A-04); Agmarknet price
 
 Synthetic demand and prices; no payments; no live tracking; estimated distances; one region and five crops; greedy per-requirement matching; SQLite single-writer; modelled baseline/scenario depend on assumptions; competitors (Ninjacart, eNAM, DeHaat) already offer parts of this — no uniqueness claim.
 
-## 9. Known bugs
+## 9. Known bugs / resolved findings
 
-None (no code exists).
+Zero open blocking bugs. Resolved post-audit:
+- Authentication API payload aligned to JSON `{ email, password }` with updated placeholders.
+- `DashboardPage` reference mapping made crash-proof with backend schema alignment.
+- Dockerfile updated with `DEMO_MODE=false` default, dynamic `$PORT` binding, persistent volume check before DB init, and `.env` files excluded in `.dockerignore`.
+- Production `SECRET_KEY` validator added to prevent insecure defaults.
 
 ## 10. Important files
 
-`docs/PRD.md` (scope, FRs) · `docs/Research.md` (evidence tags, sources) · `docs/Architecture.md` (stack, modules, repo layout) · `docs/Data.md` (schema, seed) · `docs/ML.md` (formulas, algorithms) · `docs/API.md` (42 endpoints) · `docs/Design.md` (screens) · `docs/Testing.md` (AC IDs, execution log) · `docs/Demo.md` (script, verification log) · `docs/Phases.md` (roadmap + feasibility audit) · `docs/Rules.md` · `docs/Execution.md` · `AGENTS.md` (to create in Phase 0).
+`docs/PRD.md` (scope, FRs) · `docs/Research.md` (evidence tags, sources) · `docs/Architecture.md` (stack, modules, repo layout) · `docs/Data.md` (schema, seed) · `docs/ML.md` (formulas, algorithms) · `docs/API.md` (42 endpoints) · `docs/Design.md` (screens) · `docs/Testing.md` (AC IDs, execution log) · `docs/Demo.md` (script, verification log) · `docs/Phases.md` (roadmap + feasibility audit) · `docs/Rules.md` · `docs/Execution.md` · `AGENTS.md` (active at repo root).
 
 ## 11. Completed / incomplete features
 
@@ -96,19 +100,18 @@ Completed:
 - Phase 1: Database schema (15 models), seed logic (12 users, 5 crops, 5 hubs, 5 vehicles), auth service & endpoints (/login, /demo-login, /me, /register), reference endpoints (/reference), logistics cost calculator, geo utilities, custom errors, frontend auth context, LoginPage with 6 demo personas, AppShell with role-based navigation and DEMO DATA badge.
 - Phase 2: Synthetic demand generator (`generate_data.py`), benchmark price generator (`DEMO-PRICE-ANCHOR`), Agmarknet snapshot ingestion script (`ingest_agmarknet.py`), seed integration, generator configuration (`generator.yaml`, `market_hub_map.csv`), deterministic dropout, seed reproducibility, snapshot preservation guarantees.
 - Phase 3: Producer / Farmer / FPO module: `ProducerProfileOut`/`ProducerProfileUpdate` schemas, `GET/PATCH /producers/me`, `POST/GET/PATCH /listings`, `GET /listings/{id}` with `ListingDetailResponse`, nearest hub market price lookup (real `AGMARKNET_SNAPSHOT` prioritized over `SYNTHETIC_DEMO`), `PRICE_FAR_ABOVE_BENCHMARK` warning, object-level authorization (`AC-SEC-03`, `AC-LST-06`), query-time dynamic expiration (Rule D-021), deterministic seeding of listings `L1`–`L14`, frontend `ListingsPage`, `NewListingPage` with live benchmark hint & `DemandPanelPlaceholder`, `EditListingModal`, and `ProducerProfilePage`.
-
 - Phase 4: Buyer Module: `BuyerProfileOut`/`BuyerProfileUpdate` schemas, `GET/PATCH /buyers/me`, `POST/GET/PATCH /requirements`, `GET /requirements/{id}` with `RequirementDetailResponse`, dynamic expiry evaluation on GET and PATCH, strict status validations, object-level authorization, and deterministic seeding of requirements `R1`–`R8`.
 - Phase 5: Unified Marketplace + Discovery: `POST /orders`, `GET /orders`, `GET /orders/{id}`, `POST /orders/{id}/transition`, atomic conditional reservation on Listing, concurrency-safe requirement fulfillment, financial snapshotting (farmgate, dedicated transport, 2% platform fee), deterministic seed orders O1–O6 (`CONFIRMED`, unrouted) and H1–H4 (`DELIVERED`, historical), frontend `MarketplacePage`, `OrderModal`, `OrdersPage`, and `OrderDetailPage`.
 - Phase 6: Demand Forecasting ML Pipeline: LightGBM quantile regression models, causal forward-fill imputation, Train+Val refit, validation honesty gate, fallback mechanism, TTL caching, `GET /forecasts/demand`, `GET /forecasts/hubs`, `GET /forecasts/model-info`, frontend forecast charts, hub supply-demand ranking, demand panel on listing creation.
 - Phase 7: Smart Matching & Allocation: Deterministic F1–F6 hard filters, multi-factor scoring (price 0.40, distance 0.20, freshness 0.20, fill 0.20), tie-breaking (-score, price, id), greedy multi-source allocation with below-min-order handling, max 5 near-miss diagnostics, atomic conditional `Listing` quantity updates on acceptance creating `PLACED` orders and `OrderEvent` records with requirement fulfillment recalculation, 409 `STALE_ALLOCATION` concurrency guard, reverse producer opportunities with hub demand context, frontend `/buyer/requirements/:id/match` MatchPage with interactive allocation/cards/accordion/delivery-date and `[Buyer Matches]` modal on producer listings.
 - Phase 8: Logistics Cost Calculator & Fleet APIs: Dedicated single-trip logistics estimation (`POST /logistics/estimate`), vehicle sizing per ML.md §11 (smallest fitting type if $\le 4,000$ kg; multiple trips of largest type + remainder fit if $> 4,000$ kg), transit hours estimation, `409 NO_VEHICLE_AVAILABLE` guard, public fleet inventory endpoint (`GET /logistics/vehicles`), frontend `LogisticsOpsPage` at `/ops/logistics`, `LogisticsEstimate` component, and live transport cost calculation in direct `OrderModal`.
-
 - Phase 9: Route Optimization: OR-Tools capacitated pickup-and-delivery VRP solver (`optimize_routes`), greedy fallback, multi-stop pickup and delivery grouping, `route_plans` proposal and lifecycle management (`POST /routes/optimize`, `GET /routes/plans`, `POST /routes/plans/{id}/approve`, `POST /routes/plans/{id}/discard`), atomic order state updates to `ROUTED`, shipment creation, stale plan concurrency guard (409), logistics savings against modelled direct baseline, frontend `RouteOptimization` and `RouteMap` components.
 - Phase 10: Price Transparency: Authoritative per-order waterfall arithmetic (`GET /pricing/breakdown`), baseline/reference APMC modal price and trend lookup (`GET /pricing/benchmark`), research-backed traditional multi-tier scenario comparison (`compute_traditional_scenario`), deterministic fair price band (`[L, U]`), provenance and disclaimer compliance (`AGMARKNET_SNAPSHOT` vs `SYNTHETIC_DEMO`, `basis: "MODELLED_SCENARIO"`), and frontend `OrderPriceBreakdown` and `DemandPanel` integration.
 - Phase 11: Impact Analytics Dashboard: Platform KPI overview (`GET /analytics/overview`) aggregating committed orders, transacted produce volume/value, requirement fill rate, transport costs, and approved route plan savings; 14-day daily orders/volume timeline; modelled price scenario comparisons; Hub x Crop supply-vs-demand gap matrix (`GET /analytics/supply-demand`) with Rule D-026 single-hub produce attribution (no double-counting) and status chips; full frontend `AnalyticsPage` dashboard integration.
 - Phase 12: End-to-End Integration, Demo Verification & Performance Readiness: Zero-drift reset endpoint (`POST /system/reset-demo` and `/api/v1/system/reset-demo`) resetting tables and clearing cache, full Demo.md 3-minute & 5-minute paths executed twice sequentially from fresh resets with zero drift, edge cases (R3 partial fill, R8 budget near-miss, R2 multi-source), object-level security guards verified, NFR spot checks passing all latency & solver targets, multi-stage Dockerfile and SPA static mounting (D-008), Navbar demo reset trigger for operators.
 
-Incomplete — all PLANNED: every item in PRD §14 per priority in Phases.md §15 (Phase 13: Testing + Polish + Demo Readiness freeze).
+Incomplete / Pending:
+- Phase 13: Final Testing, Polish & Demo Readiness freeze (responsive/accessibility pass, empty/error state check, demo fallback recording/screenshots, code freeze, `demo-ready` tag).
 
 ## 12. Future work
 
