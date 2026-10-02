@@ -14,12 +14,21 @@ export const LoginPage: React.FC = () => {
 
   const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
 
+  const getDestinationForRole = (role?: string) => {
+    if (!role) return '/producer/listings';
+    const r = role.toUpperCase();
+    if (r === 'PRODUCER' || role === 'farmer' || role === 'fpo') return '/producer/listings';
+    if (r === 'BUYER' || role.startsWith('buyer_')) return '/buyer/requirements';
+    if (r === 'ADMIN' || role === 'operator') return '/ops/logistics';
+    return '/market';
+  };
+
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
     try {
-      await login(email, password);
-      navigate('/');
+      const loggedUser = await login(email, password);
+      navigate(getDestinationForRole(loggedUser?.role));
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'Invalid credentials');
     }
@@ -29,8 +38,8 @@ export const LoginPage: React.FC = () => {
     setErrorMessage(null);
     setSubmittingPersona(persona.key);
     try {
-      await demoLogin(persona.key);
-      navigate('/');
+      const loggedUser = await demoLogin(persona.key);
+      navigate(getDestinationForRole(loggedUser?.role ?? persona.role));
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : 'Demo login failed');
     } finally {

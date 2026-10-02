@@ -34,6 +34,7 @@ export interface User {
   email: string;
   role: UserRole;
   name: string;
+  display_name?: string | null;
   phone?: string | null;
   is_active: boolean;
   created_at: string;
@@ -47,46 +48,46 @@ export interface AuthResponse {
 }
 
 export interface Crop {
-  code: string;
+  id: number;
   name: string;
-  perishability_class: 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH';
+  category: string;
+  agmarknet_commodity_name?: string;
   shelf_life_days: number;
-  target_temp_c?: number | null;
-  msp_inr_per_quintal?: number | null;
-  is_active: boolean;
+  max_transit_hours: number;
+  perishability: string;
+  notes?: string | null;
 }
 
 export interface Hub {
-  code: string;
+  id: number;
   name: string;
-  type: 'COLLECTION_CENTER' | 'DISTRIBUTION_HUB' | 'CONSUMPTION_MARKET';
+  city: string;
   state: string;
-  district: string;
   lat: number;
-  lon: number;
-  capacity_mt: number;
-  cold_storage_mt: number;
-  dry_storage_mt: number;
-  is_active: boolean;
+  lng: number;
+  reference_market_name?: string;
 }
 
 export interface Vehicle {
-  code: string;
-  name: string;
-  vehicle_type: string;
-  capacity_payload_kg: number;
-  capacity_volume_m3: number;
-  cold_storage_flag: boolean;
-  cost_per_km_empty: number;
-  cost_per_km_loaded: number;
-  driver_bata_per_day: number;
-  is_active: boolean;
+  id?: number;
+  name?: string;
+  vehicle_type?: string;
+  capacity_kg?: number;
+  cost_per_km?: number;
+  fixed_cost_per_trip?: number;
+  avg_speed_kmph?: number;
+  depot_name?: string;
+  depot_lat?: number;
+  depot_lng?: number;
+  is_available?: boolean;
 }
 
 export interface ReferenceDataResponse {
   crops: Crop[];
   hubs: Hub[];
-  vehicles: Vehicle[];
+  enums?: Record<string, string[]>;
+  public_config?: Record<string, any>;
+  vehicles?: Vehicle[];
 }
 
 export interface DemoPersona {

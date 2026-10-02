@@ -6,8 +6,8 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   loading: boolean;
-  login: (username: string, password: string) => Promise<void>;
-  demoLogin: (persona: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<User>;
+  demoLogin: (persona: string) => Promise<User>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -46,25 +46,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loadUser();
   }, [token, logout]);
 
-  const login = async (username: string, password: string) => {
+  const login = async (username: string, password: string): Promise<User> => {
     setLoading(true);
     try {
       const res = await loginApi(username, password);
       sessionStorage.setItem(TOKEN_KEY, res.access_token);
       setToken(res.access_token);
       setUser(res.user);
+      return res.user;
     } finally {
       setLoading(false);
     }
   };
 
-  const demoLogin = async (persona: string) => {
+  const demoLogin = async (persona: string): Promise<User> => {
     setLoading(true);
     try {
       const res = await demoLoginApi(persona);
       sessionStorage.setItem(TOKEN_KEY, res.access_token);
       setToken(res.access_token);
       setUser(res.user);
+      return res.user;
     } finally {
       setLoading(false);
     }
