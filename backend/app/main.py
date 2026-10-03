@@ -87,20 +87,20 @@ def create_app() -> FastAPI:
     def reset_demo(current_user: User = Depends(get_current_user)):
         """Drop/recreate tables and reseed deterministic demo data per API.md §1.
 
-        Requires ADMIN or OPERATOR role, and DEMO_MODE=True.
+        Requires ADMIN role, DEMO_MODE=True, and ALLOW_DEMO_RESET=True.
         """
-        if not settings.DEMO_MODE:
+        if not settings.DEMO_MODE or not settings.ALLOW_DEMO_RESET:
             raise AppException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 code="DEMO_DISABLED",
-                message="Demo reset is disabled in production environments.",
+                message="Demo reset is disabled in this environment.",
             )
 
-        if current_user.role.upper() not in ["ADMIN", "OPERATOR"]:
+        if current_user.role.upper() != "ADMIN":
             raise AppException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 code="FORBIDDEN",
-                message="Only administrators/operators can reset demo data.",
+                message="Only administrators can reset demo data.",
             )
 
         # Clear in-memory forecast cache

@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     PRICE_SOURCE: str = "synthetic"
     AGMARKNET_SNAPSHOT_PATH: str = "data/raw/agmarknet_snapshot.csv"
     DATA_GOV_IN_API_KEY: str = ""
+    ALLOW_DEMO_RESET: bool = True
     LOG_LEVEL: str = "INFO"
 
     model_config = SettingsConfigDict(
@@ -37,9 +38,16 @@ class Settings(BaseSettings):
     def validate_production_settings(self) -> "Settings":
         if self.APP_ENV == "production":
             if "change-in-production" in self.SECRET_KEY or len(self.SECRET_KEY) < 32:
-                raise ValueError(
-                    "SECRET_KEY must be a cryptographically secure string (minimum 32 characters) in production."
-                )
+                if self.DEMO_MODE:
+                    import secrets
+
+                    # Generate an ephemeral cryptographically secure 64-char key at boot
+                    # so default placeholder is never active in production demo containers
+                    self.SECRET_KEY = secrets.token_urlsafe(32)
+                else:
+                    raise ValueError(
+                        "SECRET_KEY must be a cryptographically secure string (minimum 32 characters) in production."
+                    )
         return self
 
 

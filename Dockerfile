@@ -38,4 +38,4 @@ WORKDIR /app/backend
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "if [ \"$DEMO_MODE\" = \"true\" ] && [ ! -f /app/backend/data/app.db ]; then python -m scripts.setup_demo --no-retrain; fi && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "if [ \"$DEMO_MODE\" = \"true\" ] && [ ! -f /app/backend/data/app.db ]; then python -m scripts.setup_demo --no-retrain; fi && exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

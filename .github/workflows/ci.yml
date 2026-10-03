@@ -30,6 +30,11 @@ jobs:
           cd backend
           ruff check .
 
+      - name: Seed Demo Database
+        run: |
+          cd backend
+          python -m scripts.setup_demo --no-retrain
+
       - name: Run Pytest
         run: |
           cd backend
@@ -62,3 +67,12 @@ jobs:
         run: |
           cd frontend
           npm run build
+
+  docker:
+    name: Docker Build Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t fasalsetu:ci-test .
