@@ -3,6 +3,7 @@ from fastapi import status
 from sqlalchemy import case, update
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.core.dates import today_ist
 from app.core.errors import AppException
 from app.core.geo import road_distance_km
@@ -20,6 +21,8 @@ from app.schemas.order import (
     OrderTransitionRequest,
     ProducerOrderSummary,
 )
+
+settings = get_settings()
 
 
 def build_order_out(order: Order) -> OrderOut:
@@ -230,7 +233,7 @@ def create_direct_order(
     dist_km = road_distance_km(
         (listing.producer.lat, listing.producer.lng),
         (buyer_profile.lat, buyer_profile.lng),
-        circuity=1.35,
+        circuity=settings.ROAD_CIRCUITY_FACTOR,
     )
     vehicle_types = get_vehicle_types(db)
     trip_est = estimate_dedicated_trip(dist_km, data.quantity_kg, vehicle_types)
@@ -268,7 +271,10 @@ def create_direct_order(
             Listing.available_until >= today,
         )
         .values(
-            quantity_available_kg=Listing.quantity_available_kg - data.quantity_kg,
+            quantity_available_kg=case(
+                (Listing.quantity_available_kg - data.quantity_kg <= 0.001, 0.0),
+                else_=Listing.quantity_available_kg - data.quantity_kg,
+            ),
             status=case(
                 (Listing.quantity_available_kg - data.quantity_kg <= 0.001, "SOLD_OUT"),
                 else_="ACTIVE",

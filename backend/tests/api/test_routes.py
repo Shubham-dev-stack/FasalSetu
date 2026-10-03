@@ -209,3 +209,37 @@ def test_optimize_no_eligible_orders_ac_rte_06():
     res = client.post("/api/v1/routes/optimize", headers=headers, json={})
     assert res.status_code == 422
     assert res.json()["error"]["code"] == "NO_ELIGIBLE_ORDERS"
+
+
+def test_route_plan_atomic_concurrent_approval_protection():
+    """Verify AC-RTE-10 atomic optimistic lock preventing duplicate or conflicting route approvals."""
+    token = get_token("operator")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # 1. Reset demo state to have fresh CONFIRMED orders
+    client.post("/api/v1/system/reset-demo", headers=headers)
+
+    # 2. Generate two overlapping route proposals for the confirmed orders
+    res1 = client.post("/api/v1/routes/optimize", headers=headers, json={"time_limit_s": 5})
+    assert res1.status_code == 201
+    plan1_id = res1.json()["plan_id"]
+
+    res2 = client.post("/api/v1/routes/optimize", headers=headers, json={"time_limit_s": 5})
+    assert res2.status_code == 201
+    plan2_id = res2.json()["plan_id"]
+
+    # 3. First approval succeeds
+    appr1 = client.post(f"/api/v1/routes/plans/{plan1_id}/approve", headers=headers)
+    assert appr1.status_code == 200
+    assert appr1.json()["plan"]["status"] == "APPROVED"
+
+    # 4. Approving the exact same plan again fails with 409 (already approved)
+    appr1_again = client.post(f"/api/v1/routes/plans/{plan1_id}/approve", headers=headers)
+    assert appr1_again.status_code == 409
+    assert appr1_again.json()["error"]["code"] in ["STALE_PLAN", "INVALID_TRANSITION"]
+
+    # 5. Approving overlapping plan2 fails with 409 STALE_PLAN (orders already routed)
+    appr2 = client.post(f"/api/v1/routes/plans/{plan2_id}/approve", headers=headers)
+    assert appr2.status_code == 409
+    assert appr2.json()["error"]["code"] == "STALE_PLAN"
+

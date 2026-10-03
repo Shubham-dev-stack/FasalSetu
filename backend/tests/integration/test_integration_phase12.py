@@ -70,6 +70,22 @@ def test_demo_reset_endpoint_authorization_and_modes():
     finally:
         settings.DEMO_MODE = True
 
+    # 7. In production with ALLOW_DEMO_RESET=False -> 404 DEMO_DISABLED
+    try:
+        settings.APP_ENV = "production"
+        settings.ALLOW_DEMO_RESET = False
+        res_prod_disabled = client.post("/api/v1/system/reset-demo", headers=auth_header(op_token))
+        assert res_prod_disabled.status_code == 404
+        assert res_prod_disabled.json()["error"]["code"] == "DEMO_DISABLED"
+
+        # 8. In production, operator demo-login is blocked -> 403 FORBIDDEN (F-11b)
+        res_op_demo_login = client.post("/api/v1/auth/demo-login", json={"persona": "operator"})
+        assert res_op_demo_login.status_code == 403
+        assert res_op_demo_login.json()["error"]["code"] == "FORBIDDEN"
+    finally:
+        settings.APP_ENV = "dev"
+        settings.ALLOW_DEMO_RESET = True
+
 
 def test_full_demo_script_and_zero_drift_idempotency():
     """Verify AC-INT-01, AC-INT-02, AC-INT-03:

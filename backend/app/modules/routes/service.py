@@ -3,8 +3,10 @@ from datetime import datetime
 from typing import Any
 
 from fastapi import status
+from sqlalchemy import update
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.core.errors import AppException
 from app.core.geo import road_distance_km
 from app.db.models import Order, OrderEvent, RoutePlan, Shipment, ShipmentStop, User, Vehicle
@@ -357,12 +359,27 @@ def approve_route_plan(
             if st.get("order_id"):
                 all_plan_order_ids.add(st["order_id"])
 
+    # 1. Atomic optimistic lock on RoutePlan PROPOSED -> APPROVED
+    now = datetime.utcnow()
+    plan_update = db.execute(
+        update(RoutePlan)
+        .where(RoutePlan.id == plan.id, RoutePlan.status == "PROPOSED")
+        .values(status="APPROVED", approved_at=now)
+    )
+    if plan_update.rowcount == 0:
+        raise AppException(
+            status_code=status.HTTP_409_CONFLICT,
+            code="STALE_PLAN",
+            message="Plan is not in PROPOSED state or has already been approved/discarded concurrently.",
+        )
+
     orders_in_db = (
         db.query(Order)
         .filter(Order.id.in_(all_plan_order_ids))
         .all()
     )
     if len(orders_in_db) != len(all_plan_order_ids):
+        db.rollback()
         raise AppException(
             status_code=status.HTTP_409_CONFLICT,
             code="STALE_PLAN",
@@ -371,6 +388,7 @@ def approve_route_plan(
 
     for o in orders_in_db:
         if o.status != "CONFIRMED" or o.shipment_id is not None:
+            db.rollback()
             raise AppException(
                 status_code=status.HTTP_409_CONFLICT,
                 code="STALE_PLAN",
@@ -379,6 +397,7 @@ def approve_route_plan(
 
     order_map = {o.id: o for o in orders_in_db}
     created_shipments: list[ShipmentDetailResponse] = []
+    settings = get_settings()
 
     try:
         for shp_data in result_json.get("shipments", []):
@@ -393,7 +412,7 @@ def approve_route_plan(
                 peak_load_kg=shp_data["peak_load_kg"],
                 utilization_pct=shp_data["utilization_pct"],
                 est_duration_min=shp_data["est_duration_min"],
-                created_at=datetime.utcnow(),
+                created_at=now,
             )
             db.add(shipment)
             db.flush()
@@ -428,7 +447,7 @@ def approve_route_plan(
                 direct_km = road_distance_km(
                     (o.producer.lat, o.producer.lng),
                     (o.buyer.lat, o.buyer.lng),
-                    circuity=1.35,
+                    circuity=settings.ROAD_CIRCUITY_FACTOR,
                 )
                 order_kg_kms[o.id] = float(o.quantity_kg) * direct_km
 
@@ -437,7 +456,6 @@ def approve_route_plan(
 
             running_allocated = 0.0
             for idx, o in enumerate(shp_orders):
-                o.shipment_id = shipment.id
                 if total_kg_km > 0:
                     if idx == len(shp_orders) - 1:
                         # Remainder to guarantee sum == total_cost ±0.01 (AC-RTE-09)
@@ -449,6 +467,28 @@ def approve_route_plan(
                 else:
                     allocated = round(total_shipment_cost / len(shp_orders), 2)
 
+                # Atomic conditional assignment on Order
+                order_res = db.execute(
+                    update(Order)
+                    .where(
+                        Order.id == o.id,
+                        Order.status == "CONFIRMED",
+                        Order.shipment_id.is_(None),
+                    )
+                    .values(
+                        shipment_id=shipment.id,
+                        allocated_transport_cost_total=allocated,
+                    )
+                )
+                if order_res.rowcount == 0:
+                    db.rollback()
+                    raise AppException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        code="STALE_PLAN",
+                        message=f"Order #{o.id} is no longer in CONFIRMED unrouted state.",
+                    )
+
+                o.shipment_id = shipment.id
                 o.allocated_transport_cost_total = allocated
 
                 # Log order event
@@ -480,9 +520,6 @@ def approve_route_plan(
                 )
             )
 
-        # Update plan status to APPROVED
-        plan.status = "APPROVED"
-        plan.approved_at = datetime.utcnow()
         result_json["status"] = "APPROVED"
         plan.result_json = result_json
 

@@ -6,6 +6,7 @@ from fastapi import status
 from sqlalchemy import case, update
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.core.dates import today_ist
 from app.core.errors import AppException
 from app.core.geo import road_distance_km
@@ -42,6 +43,8 @@ from app.schemas.matching import (
     RequirementSummary,
 )
 from app.schemas.order import CropOrderSummary
+
+settings = get_settings()
 
 
 def get_requirement_candidates(
@@ -476,7 +479,7 @@ def accept_matching_allocation(
             dist_km = road_distance_km(
                 (listing.producer.lat, listing.producer.lng),
                 (buyer_profile.lat, buyer_profile.lng),
-                circuity=1.35,
+                circuity=settings.ROAD_CIRCUITY_FACTOR,
             )
             trip_est = estimate_dedicated_trip(dist_km, alloc.quantity_kg, vehicle_types)
             transit_hours = trip_est["transit_hours"]
@@ -516,7 +519,10 @@ def accept_matching_allocation(
                     Listing.available_until >= today,
                 )
                 .values(
-                    quantity_available_kg=Listing.quantity_available_kg - alloc.quantity_kg,
+                    quantity_available_kg=case(
+                        (Listing.quantity_available_kg - alloc.quantity_kg <= 0.001, 0.0),
+                        else_=Listing.quantity_available_kg - alloc.quantity_kg,
+                    ),
                     status=case(
                         (Listing.quantity_available_kg - alloc.quantity_kg <= 0.001, "SOLD_OUT"),
                         else_="ACTIVE",
