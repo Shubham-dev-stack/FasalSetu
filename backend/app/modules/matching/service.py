@@ -518,7 +518,7 @@ def accept_matching_allocation(
                 .values(
                     quantity_available_kg=Listing.quantity_available_kg - alloc.quantity_kg,
                     status=case(
-                        (Listing.quantity_available_kg - alloc.quantity_kg <= 0.0, "SOLD_OUT"),
+                        (Listing.quantity_available_kg - alloc.quantity_kg <= 0.001, "SOLD_OUT"),
                         else_="ACTIVE",
                     ),
                 )

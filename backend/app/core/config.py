@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     PRICE_SOURCE: str = "synthetic"
     AGMARKNET_SNAPSHOT_PATH: str = "data/raw/agmarknet_snapshot.csv"
     DATA_GOV_IN_API_KEY: str = ""
-    ALLOW_DEMO_RESET: bool = True
+    ALLOW_DEMO_RESET: bool | None = None
     LOG_LEVEL: str = "INFO"
 
     model_config = SettingsConfigDict(
@@ -36,8 +36,12 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_production_settings(self) -> "Settings":
+        if self.ALLOW_DEMO_RESET is None:
+            # In production, reset-demo is disabled by default unless explicitly opted in
+            self.ALLOW_DEMO_RESET = self.APP_ENV != "production"
+
         if self.APP_ENV == "production":
-            if "change-in-production" in self.SECRET_KEY or len(self.SECRET_KEY) < 32:
+            if "change-in-production" in self.SECRET_KEY or self.SECRET_KEY == "dev-secret-key-change-in-production-only-placeholder-32chars":
                 if self.DEMO_MODE:
                     import secrets
 
@@ -48,6 +52,10 @@ class Settings(BaseSettings):
                     raise ValueError(
                         "SECRET_KEY must be a cryptographically secure string (minimum 32 characters) in production."
                     )
+            elif len(self.SECRET_KEY) < 32:
+                raise ValueError(
+                    "Explicitly provided SECRET_KEY must be at least 32 characters long."
+                )
         return self
 
 

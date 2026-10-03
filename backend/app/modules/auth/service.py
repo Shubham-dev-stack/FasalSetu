@@ -29,6 +29,13 @@ def demo_login_user(db: Session, persona: str) -> User:
             message="Demo mode is disabled on this server.",
         )
 
+    if settings.APP_ENV == "production" and persona == "operator":
+        raise AppException(
+            status_code=403,
+            code="FORBIDDEN",
+            message="Operator persona login via demo-login is disabled in production environments. Use credentials via /auth/login.",
+        )
+
     email = CANONICAL_PERSONAS.get(persona)
     if not email:
         raise AppException(

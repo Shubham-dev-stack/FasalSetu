@@ -112,7 +112,7 @@ React + TypeScript SPA; FastAPI modular monolith; SQLite via SQLAlchemy (Postgre
 | Landed price rank 1 (₹/kg) | ₹25.53/kg (Farmgate ₹23.00 + Trans ₹2.07 + Fee ₹0.46) | 2026-10-02 |
 | Plan: method, solve time, vehicles used | ORTOOLS, 5.08s wall time, 5 vehicles used | 2026-10-02 |
 | Plan: optimized km / baseline km; ₹ / ₹ | 909.1 km / 1,307.3 km; ₹17,783.26 / ₹20,851.84 (savings: 398.2 km, ₹3,068.58 / 14.7%) | 2026-10-02 |
-| Waterfall: farmgate / transport / fee / landed | ₹23.00 / ₹3.52 / ₹0.46 / ₹26.98 (reconciles ±0.01) | 2026-10-02 |
+| Waterfall: farmgate / transport / fee / landed | ₹23.00 / ₹3.52 / ₹0.46 / ₹26.98 (reconciles ±0.01; O1 allocated consolidated route transport is ₹3.52/kg vs its dedicated charter baseline ₹4.07/kg, representing a 13.6% transport savings; distinct from R1 1,500kg dedicated estimate ₹2.07/kg) | 2026-10-02 |
 | Model card: deployed_method, val & test MAE vs baseline | LIGHTGBM, Val MAE: 105.42, Test MAE: 104.66 vs B1 Seasonal Naive: 137.55 (passed gate) | 2026-10-02 |
 | Analytics KPIs after demo path | Committed orders: 11, Volume: 7,850 kg, Value: ₹1,74,600, Fill rate: 9.26%, Route savings: 398.2 km (₹3,068.58) | 2026-10-02 |
 
